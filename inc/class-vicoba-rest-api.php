@@ -55,7 +55,21 @@ class VICOBA_REST_API {
         // --- SUPER ADMIN ---
         register_rest_route(self::$namespace, '/superadmin/groups',     ['methods'=>'GET','callback'=>[__CLASS__,'handle_get_groups'],'permission_callback'=>[__CLASS__,'check_super_admin']]);
         register_rest_route(self::$namespace, '/superadmin/group-status',['methods'=>'POST','callback'=>[__CLASS__,'handle_group_status'],'permission_callback'=>[__CLASS__,'check_super_admin']]);
+
+        // --- NOTIFICATIONS ---
+        register_rest_route(self::$namespace, '/notifications/mark-read', ['methods'=>'POST','callback'=>[__CLASS__,'handle_mark_notif_read'],'permission_callback'=>[__CLASS__,'check_logged_in']]);
+        register_rest_route(self::$namespace, '/notifications/list',      ['methods'=>'GET','callback'=>[__CLASS__,'handle_get_notifications'],'permission_callback'=>[__CLASS__,'check_logged_in']]);
+
+        // --- MEETINGS: Minutes Update ---
+        register_rest_route(self::$namespace, '/meetings/update-minutes', ['methods'=>'POST','callback'=>[__CLASS__,'handle_update_minutes'],'permission_callback'=>[__CLASS__,'check_admin']]);
+
+        // --- LOANS: Repayment Schedule ---
+        register_rest_route(self::$namespace, '/loans/schedule',          ['methods'=>'GET','callback'=>[__CLASS__,'handle_get_loan_schedule'],'permission_callback'=>[__CLASS__,'check_logged_in']]);
+
+        // --- MEMBERS: Update Role ---
+        register_rest_route(self::$namespace, '/members/update-role',     ['methods'=>'POST','callback'=>[__CLASS__,'handle_update_member_role'],'permission_callback'=>[__CLASS__,'check_admin']]);
     }
+
 
     /* ============ PERMISSION CHECKS ============ */
 
@@ -445,4 +459,89 @@ class VICOBA_REST_API {
         );
         return new WP_REST_Response(['success'=>(false !== $res),'message'=>'Hali ya kikundi imebadilishwa!'], 200);
     }
+
+    /* ============ NOTIFICATIONS ============ */
+
+    public static function handle_mark_notif_read($request) {
+        $p    = $request->get_json_params();
+        $id   = absint($p['notification_id'] ?? 0);
+        $uid  = get_current_user_id();
+        $res  = VICOBA_Notifications::mark_as_read($id, $uid);
+        return new WP_REST_Response(['success' => (false !== $res), 'message' => 'Arifa imesomwa.'], 200);
+    }
+
+    public static function handle_get_notifications($request) {
+        $uid   = get_current_user_id();
+        $notifs = VICOBA_Notifications::get_user_notifications($uid, false);
+        return new WP_REST_Response(['success' => true, 'notifications' => $notifs], 200);
+    }
+
+    /* ============ MEETINGS: MINUTES ============ */
+
+    public static function handle_update_minutes($request) {
+        $p          = $request->get_json_params();
+        $meeting_id = absint($p['meeting_id'] ?? 0);
+        $minutes    = sanitize_textarea_field($p['minutes'] ?? '');
+        $res        = VICOBA_Meetings::update_minutes($meeting_id, $minutes, 'completed');
+        return new WP_REST_Response([
+            'success' => (false !== $res),
+            'message' => 'Muhtasari wa mkutano umehifadhiwa!'
+        ], 200);
+    }
+
+    /* ============ LOANS: SCHEDULE ============ */
+
+    public static function handle_get_loan_schedule($request) {
+        $loan_id = absint($request->get_param('loan_id') ?? 0);
+        if (!$loan_id) return new WP_Error('invalid', 'Loan ID inahitajika.', ['status'=>400]);
+
+        global $wpdb;
+        $loan = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}vicoba_loans WHERE id=%d", $loan_id));
+        if (!$loan) return new WP_Error('not_found', 'Mkopo haukupatikana.', ['status'=>404]);
+
+        $schedule = VICOBA_Loans::calculate_loan_schedule(
+            $loan->principal_amount,
+            $loan->interest_rate,
+            $loan->interest_type,
+            $loan->repayment_period_months
+        );
+
+        return new WP_REST_Response([
+            'success'             => true,
+            'loan_code'           => $loan->loan_code,
+            'monthly_installment' => $schedule['monthly_installment'],
+            'total_payable'       => $schedule['total_payable'],
+            'total_interest'      => $schedule['total_interest'],
+            'schedule'            => $schedule['schedule'],
+        ], 200);
+    }
+
+    /* ============ MEMBERS: UPDATE ROLE ============ */
+
+    public static function handle_update_member_role($request) {
+        $p         = $request->get_json_params();
+        $member_id = absint($p['member_id'] ?? 0);
+        $new_role  = sanitize_text_field($p['role'] ?? 'member');
+
+        $allowed_roles = ['member','treasurer','secretary','group_admin','super_admin'];
+        if (!in_array($new_role, $allowed_roles)) {
+            return new WP_Error('invalid_role', 'Jukumu halilo halali.', ['status'=>400]);
+        }
+
+        global $wpdb;
+        $member = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}vicoba_members WHERE id=%d", $member_id));
+        if (!$member) return new WP_Error('not_found', 'Mwanachama hakupatikana.', ['status'=>404]);
+
+        // Update vicoba_members role
+        $wpdb->update("{$wpdb->prefix}vicoba_members", ['role' => $new_role], ['id' => $member_id]);
+
+        // Update WP user role
+        $user = new WP_User($member->user_id);
+        $user->set_role($new_role);
+
+        VICOBA_Audit::log('member_role_updated', $member->group_id, 'member', $member_id, $member->role, $new_role);
+
+        return new WP_REST_Response(['success' => true, 'message' => 'Jukumu la mwanachama limebadilishwa!'], 200);
+    }
 }
+

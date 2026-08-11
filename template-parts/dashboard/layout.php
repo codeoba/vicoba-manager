@@ -110,14 +110,47 @@ $nav_items = array(
                 </h2>
             </div>
 
-            <!-- Group Indicator & Logout -->
-            <div class="flex items-center space-x-4">
+            <!-- Group Indicator, Notifications Bell & Logout -->
+            <div class="flex items-center space-x-3">
                 <?php if ($group) : ?>
                     <div class="hidden sm:flex items-center px-3 py-1.5 rounded-full bg-vicoba-50 border border-vicoba-200 text-vicoba-800 text-xs font-bold">
                         <i class="fa-solid fa-building-columns mr-2 text-vicoba-600"></i>
-                        <span><?php echo esc_html($group->name); ?> (<?php echo esc_html($group->currency); ?>)</span>
+                        <span><?php echo esc_html($group->name); ?> (<?php echo esc_html($group->currency ?? 'TZS'); ?>)</span>
                     </div>
                 <?php endif; ?>
+
+                <!-- Notifications Bell -->
+                <?php
+                $unread_notifs = VICOBA_Notifications::get_user_notifications($current_user->ID, true);
+                $unread_count  = count($unread_notifs);
+                ?>
+                <button id="notifBell" onclick="toggleNotifPanel()" class="relative p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition" title="Arifa">
+                    <i class="fa-solid fa-bell text-lg"></i>
+                    <?php if ($unread_count > 0): ?>
+                    <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-extrabold flex items-center justify-center"><?php echo min($unread_count, 9); ?><?php echo $unread_count > 9 ? '+' : ''; ?></span>
+                    <?php endif; ?>
+                </button>
+
+                <!-- Notification Dropdown Panel -->
+                <div id="notifPanel" class="hidden absolute right-4 top-20 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden">
+                    <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-slate-700">Arifa Zangu (<?php echo $unread_count; ?> mpya)</span>
+                        <button onclick="toggleNotifPanel()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                        <?php if (empty($unread_notifs)): ?>
+                        <p class="py-8 text-center text-xs text-slate-400"><i class="fa-solid fa-bell-slash block text-2xl mb-2 opacity-30"></i>Hakuna arifa mpya</p>
+                        <?php else: ?>
+                        <?php foreach (array_slice($unread_notifs, 0, 10) as $notif): ?>
+                        <div class="px-4 py-3 hover:bg-slate-50 cursor-pointer" onclick="markNotifRead(<?php echo $notif->id; ?>, this)">
+                            <p class="text-xs font-bold text-slate-800"><?php echo esc_html($notif->title); ?></p>
+                            <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2"><?php echo esc_html($notif->message); ?></p>
+                            <p class="text-[10px] text-slate-400 mt-1"><?php echo date('d/m/Y H:i', strtotime($notif->created_at)); ?></p>
+                        </div>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
                 <a href="<?php echo wp_logout_url(VICOBA_Router::get_url('login')); ?>" class="flex items-center px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition">
                     <i class="fa-solid fa-right-from-bracket mr-1.5"></i> Toka
@@ -127,6 +160,27 @@ $nav_items = array(
 
         <!-- Main Body Workspace -->
         <main class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-50">
+            <?php
+            // Overdue loans alert banner
+            global $wpdb;
+            $overdue_count = (int)$wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->prefix}vicoba_loans WHERE group_id=%d AND status='overdue'",
+                $group ? $group->id : 0
+            ));
+            if ($overdue_count > 0 && in_array($user_role, ['super_admin','group_admin','treasurer','administrator'])):
+            ?>
+            <div class="mb-5 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-between gap-4">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xl mr-3"></i>
+                    <div>
+                        <p class="text-sm font-extrabold text-rose-800">Mikopo <?php echo $overdue_count; ?> imechelewa!</p>
+                        <p class="text-xs text-rose-600">Riba ya adhabu inaendelea kuongezeka. Wasiliana na wanachama wanaohusika mara moja.</p>
+                    </div>
+                </div>
+                <a href="<?php echo VICOBA_Router::get_url('dashboard', 'loans'); ?>" class="shrink-0 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition">Angalia Mikopo</a>
+            </div>
+            <?php endif; ?>
+
             <?php
             $template_file = get_template_directory() . '/template-parts/dashboard/' . sanitize_file_name($subroute) . '.php';
             if (file_exists($template_file)) {
@@ -138,5 +192,25 @@ $nav_items = array(
         </main>
     </div>
 </div>
+
+<script>
+function toggleNotifPanel() {
+    document.getElementById('notifPanel')?.classList.toggle('hidden');
+}
+function markNotifRead(id, el) {
+    fetch(vicobaData.root + 'vicoba/v1/notifications/mark-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': vicobaData.nonce },
+        body: JSON.stringify({ notification_id: id })
+    }).then(() => el.style.opacity = '0.5');
+}
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('notifPanel');
+    const bell  = document.getElementById('notifBell');
+    if (panel && !panel.contains(e.target) && bell && !bell.contains(e.target)) {
+        panel.classList.add('hidden');
+    }
+});
+</script>
 
 <?php get_footer(); ?>

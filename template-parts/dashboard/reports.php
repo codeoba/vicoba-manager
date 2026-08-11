@@ -59,12 +59,32 @@ if ($filter_member_id) {
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 no-print">
         <div>
             <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Ripoti & Export</h1>
-            <p class="text-xs text-slate-500 mt-1">Angalia muhtasari wa fedha, taarifa za wanachama, na chapisha ripoti</p>
+            <p class="text-xs text-slate-500 mt-1">Angalia muhtasari wa fedha, taarifa za wanachama, na chapisha / pakua ripoti</p>
         </div>
-        <button id="printReportBtn" onclick="window.print()" class="inline-flex items-center px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-lg transition">
-            <i class="fa-solid fa-print mr-2"></i> Chapisha Ripoti
-        </button>
+        <div class="flex gap-2 flex-wrap">
+            <?php
+            $csv_base = add_query_arg([
+                'vicoba_export' => 'ledger_csv',
+                'from'          => $filter_from,
+                'to'            => $filter_to,
+            ], home_url('/'));
+            $stmt_csv = add_query_arg([
+                'vicoba_export' => 'member_statement_csv',
+                'member_id'     => $filter_member_id ?: ($member ? $member->id : 0),
+            ], home_url('/'));
+            ?>
+            <a href="<?php echo esc_url($csv_base); ?>" class="inline-flex items-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg transition">
+                <i class="fa-solid fa-file-csv mr-2"></i> Pakua Ledger (CSV)
+            </a>
+            <a href="<?php echo esc_url($stmt_csv); ?>" class="inline-flex items-center px-3 py-2 rounded-xl bg-vicoba-600 hover:bg-vicoba-700 text-white font-bold text-xs shadow-lg transition">
+                <i class="fa-solid fa-file-arrow-down mr-2"></i> Pakua Statement (CSV)
+            </a>
+            <button id="printReportBtn" onclick="window.print()" class="inline-flex items-center px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-lg transition">
+                <i class="fa-solid fa-print mr-2"></i> Chapisha
+            </button>
+        </div>
     </div>
+
 
     <!-- Filters -->
     <form method="GET" class="glass-card p-5 rounded-2xl border border-slate-200/80 bg-white no-print">
