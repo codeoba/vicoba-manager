@@ -65,10 +65,8 @@ class VICOBA_REST_API {
 
         // --- LOANS: Repayment Schedule ---
         register_rest_route(self::$namespace, '/loans/schedule',          ['methods'=>'GET','callback'=>[__CLASS__,'handle_get_loan_schedule'],'permission_callback'=>[__CLASS__,'check_logged_in']]);
-
-        // --- MEMBERS: Update Role ---
-        register_rest_route(self::$namespace, '/members/update-role',     ['methods'=>'POST','callback'=>[__CLASS__,'handle_update_member_role'],'permission_callback'=>[__CLASS__,'check_admin']]);
     }
+
 
 
     /* ============ PERMISSION CHECKS ============ */
@@ -192,9 +190,29 @@ class VICOBA_REST_API {
     }
 
     public static function handle_update_member_role($request) {
-        $p = $request->get_json_params();
-        $res = VICOBA_Members::update_role(intval($p['member_id']), sanitize_text_field($p['role']));
-        return new WP_REST_Response(['success'=>(bool)$res,'message'=>'Jukumu la mwanachama limebadilishwa!'], 200);
+        $p         = $request->get_json_params();
+        $member_id = absint($p['member_id'] ?? 0);
+        $new_role  = sanitize_text_field($p['role'] ?? 'member');
+
+        $allowed_roles = ['member','treasurer','secretary','group_admin','super_admin'];
+        if (!in_array($new_role, $allowed_roles)) {
+            return new WP_Error('invalid_role', 'Jukumu halilo halali.', ['status'=>400]);
+        }
+
+        global $wpdb;
+        $member = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}vicoba_members WHERE id=%d", $member_id));
+        if (!$member) return new WP_Error('not_found', 'Mwanachama hakupatikana.', ['status'=>404]);
+
+        // Update vicoba_members role
+        $wpdb->update("{$wpdb->prefix}vicoba_members", ['role' => $new_role], ['id' => $member_id]);
+
+        // Update WP user role
+        $user = new WP_User($member->user_id);
+        $user->set_role($new_role);
+
+        VICOBA_Audit::log('member_role_updated', $member->group_id, 'member', $member_id, $member->role, $new_role);
+
+        return new WP_REST_Response(['success' => true, 'message' => 'Jukumu la mwanachama limebadilishwa!'], 200);
     }
 
     /* ============ SHARES ============ */
@@ -516,32 +534,5 @@ class VICOBA_REST_API {
         ], 200);
     }
 
-    /* ============ MEMBERS: UPDATE ROLE ============ */
-
-    public static function handle_update_member_role($request) {
-        $p         = $request->get_json_params();
-        $member_id = absint($p['member_id'] ?? 0);
-        $new_role  = sanitize_text_field($p['role'] ?? 'member');
-
-        $allowed_roles = ['member','treasurer','secretary','group_admin','super_admin'];
-        if (!in_array($new_role, $allowed_roles)) {
-            return new WP_Error('invalid_role', 'Jukumu halilo halali.', ['status'=>400]);
-        }
-
-        global $wpdb;
-        $member = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}vicoba_members WHERE id=%d", $member_id));
-        if (!$member) return new WP_Error('not_found', 'Mwanachama hakupatikana.', ['status'=>404]);
-
-        // Update vicoba_members role
-        $wpdb->update("{$wpdb->prefix}vicoba_members", ['role' => $new_role], ['id' => $member_id]);
-
-        // Update WP user role
-        $user = new WP_User($member->user_id);
-        $user->set_role($new_role);
-
-        VICOBA_Audit::log('member_role_updated', $member->group_id, 'member', $member_id, $member->role, $new_role);
-
-        return new WP_REST_Response(['success' => true, 'message' => 'Jukumu la mwanachama limebadilishwa!'], 200);
-    }
 }
 
