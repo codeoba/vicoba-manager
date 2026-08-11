@@ -12,6 +12,9 @@ $group = $member ? VICOBA_Groups::get_group($member->group_id) : null;
 
 // Determine active subroute
 $subroute = get_query_var('vicoba_subroute');
+if (empty($subroute) && isset($_GET['vicoba_subroute'])) {
+    $subroute = sanitize_text_field($_GET['vicoba_subroute']);
+}
 if (empty($subroute)) {
     $subroute = 'overview';
 }
@@ -64,7 +67,7 @@ $nav_items = array(
             <?php foreach ($nav_items as $item) : ?>
                 <?php if (in_array($user_role, $item['roles']) || in_array('administrator', $current_user->roles)) : ?>
                     <?php $is_active = ($subroute === $item['key']); ?>
-                    <a href="<?php echo home_url('/dashboard/' . $item['key'] . '/'); ?>" 
+                    <a href="<?php echo VICOBA_Router::get_url('dashboard', $item['key']); ?>" 
                        class="flex items-center px-3.5 py-3 text-sm font-semibold rounded-xl transition-all duration-150 <?php echo $is_active ? 'bg-gradient-to-r from-vicoba-600 to-emerald-600 text-white shadow-lg shadow-vicoba-950/50 translate-x-1' : 'text-vicoba-100 hover:bg-vicoba-800/60 hover:text-white'; ?>">
                         <i class="fa-solid <?php echo $item['icon']; ?> w-6 text-center text-lg mr-3 <?php echo $is_active ? 'text-white' : 'text-vicoba-400'; ?>"></i>
                         <span><?php echo $item['label']; ?></span>
@@ -84,7 +87,7 @@ $nav_items = array(
                     <p class="text-[10px] text-vicoba-300 truncate"><?php echo $member ? esc_html($member->member_number) : 'Admin'; ?></p>
                 </div>
             </div>
-            <a href="<?php echo wp_logout_url(home_url('/login/')); ?>" class="text-vicoba-300 hover:text-rose-400 p-2 rounded-lg transition" title="Toka (Logout)">
+            <a href="<?php echo wp_logout_url(VICOBA_Router::get_url('login')); ?>" class="text-vicoba-300 hover:text-rose-400 p-2 rounded-lg transition" title="Toka (Logout)">
                 <i class="fa-solid fa-right-from-bracket text-lg"></i>
             </a>
         </div>
@@ -116,7 +119,7 @@ $nav_items = array(
                     </div>
                 <?php endif; ?>
 
-                <a href="<?php echo wp_logout_url(home_url('/login/')); ?>" class="flex items-center px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition">
+                <a href="<?php echo wp_logout_url(VICOBA_Router::get_url('login')); ?>" class="flex items-center px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition">
                     <i class="fa-solid fa-right-from-bracket mr-1.5"></i> Toka
                 </a>
             </div>
