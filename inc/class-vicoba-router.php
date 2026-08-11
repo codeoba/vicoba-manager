@@ -15,6 +15,7 @@ class VICOBA_Router {
         add_filter('query_vars', array(__CLASS__, 'add_query_vars'));
         add_action('template_redirect', array(__CLASS__, 'dispatch_templates'));
         add_action('admin_init', array(__CLASS__, 'restrict_admin_access'));
+        add_action('wp_loaded', array(__CLASS__, 'auto_flush_rules'));
     }
 
     public static function add_rewrite_rules() {
@@ -22,6 +23,14 @@ class VICOBA_Router {
         add_rewrite_rule('^register/?$', 'index.php?vicoba_route=register', 'top');
         add_rewrite_rule('^dashboard/?$', 'index.php?vicoba_route=dashboard&vicoba_subroute=overview', 'top');
         add_rewrite_rule('^dashboard/([a-zA-Z0-9_-]+)/?$', 'index.php?vicoba_route=dashboard&vicoba_subroute=$matches[1]', 'top');
+    }
+
+    public static function auto_flush_rules() {
+        $rules = get_option('rewrite_rules');
+        if (!isset($rules['^dashboard/?$']) || !isset($rules['^login/?$'])) {
+            self::add_rewrite_rules();
+            flush_rewrite_rules(false);
+        }
     }
 
     public static function add_query_vars($vars) {
@@ -33,6 +42,14 @@ class VICOBA_Router {
     public static function dispatch_templates() {
         $route = get_query_var('vicoba_route');
         $subroute = get_query_var('vicoba_subroute');
+
+        // Fallback to $_GET parameters if query_var is empty (e.g. before rewrite rules flush)
+        if (empty($route) && isset($_GET['vicoba_route'])) {
+            $route = sanitize_text_field($_GET['vicoba_route']);
+        }
+        if (empty($subroute) && isset($_GET['vicoba_subroute'])) {
+            $subroute = sanitize_text_field($_GET['vicoba_subroute']);
+        }
 
         if (empty($route)) {
             return;
