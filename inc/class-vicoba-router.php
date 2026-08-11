@@ -1,8 +1,7 @@
 <?php
 /**
  * VICOBA Frontend Router
- * Bulletproof routing supporting clean URLs (/dashboard, /login, /register)
- * with automatic fallback to query parameter routing (?vicoba_route=dashboard)
+ * Bulletproof query-parameter & path routing for all sidebar features
  */
 
 if (!defined('ABSPATH')) {
@@ -26,17 +25,10 @@ class VICOBA_Router {
         add_rewrite_rule('^dashboard/([a-zA-Z0-9_-]+)/?$', 'index.php?vicoba_route=dashboard&vicoba_subroute=$matches[1]', 'top');
     }
 
+    /**
+     * Generate URL for VICOBA routes
+     */
     public static function get_url($route = 'dashboard', $subroute = '') {
-        $using_permalinks = (bool) get_option('permalink_structure');
-        
-        if ($using_permalinks) {
-            $url = home_url('/' . $route . '/');
-            if (!empty($subroute) && $subroute !== 'overview') {
-                $url = home_url('/' . $route . '/' . $subroute . '/');
-            }
-            return $url;
-        }
-
         $url = home_url('/?vicoba_route=' . $route);
         if (!empty($subroute)) {
             $url .= '&vicoba_subroute=' . $subroute;
@@ -69,7 +61,7 @@ class VICOBA_Router {
         $route = get_query_var('vicoba_route');
         $subroute = get_query_var('vicoba_subroute');
 
-        // Fallback to GET parameters
+        // Check GET parameters
         if (empty($route) && isset($_GET['vicoba_route'])) {
             $route = sanitize_text_field($_GET['vicoba_route']);
         }

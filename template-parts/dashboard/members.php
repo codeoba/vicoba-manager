@@ -76,7 +76,7 @@ $is_admin = in_array($user_role, array('super_admin', 'group_admin', 'secretary'
                                     <?php endif; ?>
                                 </td>
                                 <td class="py-3.5 px-4 text-right">
-                                    <a href="<?php echo home_url('/dashboard/reports/?member_id=' . $m->id); ?>" class="inline-flex items-center px-2.5 py-1 rounded-lg bg-vicoba-50 hover:bg-vicoba-100 text-vicoba-700 font-bold text-xs mr-1 transition" title="Taarifa / Statement">
+                                    <a href="<?php echo VICOBA_Router::get_url('dashboard', 'reports') . '&member_id=' . $m->id; ?>" class="inline-flex items-center px-2.5 py-1 rounded-lg bg-vicoba-50 hover:bg-vicoba-100 text-vicoba-700 font-bold text-xs mr-1 transition" title="Taarifa / Statement">
                                         <i class="fa-solid fa-file-lines mr-1"></i> Statement
                                     </a>
                                 </td>

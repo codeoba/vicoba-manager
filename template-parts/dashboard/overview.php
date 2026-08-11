@@ -145,7 +145,7 @@ foreach ($fines as $f) {
             </div>
 
             <div class="mt-6 pt-4 border-t border-slate-100">
-                <a href="<?php echo home_url('/dashboard/ledger/'); ?>" class="w-full flex items-center justify-center py-2.5 px-4 rounded-xl bg-vicoba-50 hover:bg-vicoba-100 text-vicoba-700 font-bold text-xs transition">
+                <a href="<?php echo VICOBA_Router::get_url('dashboard', 'ledger'); ?>" class="w-full flex items-center justify-center py-2.5 px-4 rounded-xl bg-vicoba-50 hover:bg-vicoba-100 text-vicoba-700 font-bold text-xs transition">
                     <i class="fa-solid fa-book-bookmark mr-2"></i> Fungua Ledger Kamili
                 </a>
             </div>
