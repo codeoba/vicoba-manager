@@ -1,0 +1,51 @@
+/*
+Theme Name: Vicoba Manager
+Theme URI: https://vicobamanager.co.tz
+Description: Multi-tenant VICOBA (Village Community Banking) SaaS Platform Theme for WordPress.
+Version: 1.0.0
+Author: Antigravity AI
+Author URI: https://vicobamanager.co.tz
+Text Domain: vicoba-manager
+License: GPLv2 or later
+*/
+
+/* Custom Glassmorphism & UI Helpers */
+:root {
+  --vicoba-primary: #0f766e;
+  --vicoba-primary-dark: #115e59;
+  --vicoba-accent: #f59e0b;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Glass effect utilities */
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-nav {
+  background: rgba(15, 118, 110, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Custom Printable Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
