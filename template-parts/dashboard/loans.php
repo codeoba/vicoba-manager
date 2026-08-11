@@ -233,55 +233,35 @@ if ($member) {
 function openRepayModal(loanId, loanCode, balance) {
     document.getElementById('repay_loan_id').value = loanId;
     document.getElementById('repay_loan_code').innerText = loanCode;
-    document.getElementById('repay_balance').innerText = 'TZS ' + balance.toLocaleString();
+    document.getElementById('repay_balance').innerText = 'TZS ' + parseFloat(balance).toLocaleString();
     document.getElementById('repayLoanModal').classList.remove('hidden');
 }
 
-async function respondGuarantor(guarantorId, status) {
-    try {
-        const res = await fetch(vicobaData.root + 'vicoba/v1/loans/guarantor-respond', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': vicobaData.nonce,
-            },
-            body: JSON.stringify({ guarantor_id: guarantorId, status })
-        });
-        const data = await res.json();
-        if (data.success) {
-            Swal.fire('Imefanikiwa!', data.message, 'success').then(() => location.reload());
-        }
-    } catch(err) {
-        Swal.fire('Hitilafu', 'Imeshindikana kusindika majibu.', 'error');
-    }
-}
-
-async function disburseLoan(loanId) {
-    const confirm = await Swal.fire({
-        title: 'Unathibitisha?',
-        text: 'Unathibitisha kutoa na kuidhinisha mkopo huu?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Ndiyo, Idhinisha!'
+function respondGuarantor(guarantorId, status) {
+    const msg = status === 'approved' ? 'Je, unakubali kuwa mdhamini?' : 'Je, unakataa ombi hili la udhamini?';
+    if (!confirm(msg)) return;
+    fetch(vicobaData.root + 'vicoba/v1/loans/guarantor-respond', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': vicobaData.nonce },
+        body: JSON.stringify({ guarantor_id: guarantorId, status: status })
+    }).then(r => r.json()).then(res => {
+        if (res.success) { alert(res.message); location.reload(); }
+        else { alert(res.message || 'Hitilafu!'); }
     });
-
-    if (confirm.isConfirmed) {
-        try {
-            const res = await fetch(vicobaData.root + 'vicoba/v1/loans/disburse', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': vicobaData.nonce,
-                },
-                body: JSON.stringify({ loan_id: loanId })
-            });
-            const data = await res.json();
-            if (data.success) {
-                Swal.fire('Umeidhinishwa!', data.message, 'success').then(() => location.reload());
-            }
-        } catch(err) {
-            Swal.fire('Hitilafu', 'Imeshindikana kuidhinisha mkopo.', 'error');
-        }
-    }
 }
+
+function disburseLoan(loanId) {
+    if (!confirm('Je, unathibitisha kutoa na kuidhinisha mkopo huu? Hatua hii haiwezi kubatilishwa.')) return;
+    fetch(vicobaData.root + 'vicoba/v1/loans/disburse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': vicobaData.nonce },
+        body: JSON.stringify({ loan_id: loanId, payment_method: 'cash' })
+    }).then(r => r.json()).then(res => {
+        alert(res.message || (res.success ? 'Imefanikiwa!' : 'Hitilafu!'));
+        if (res.success) location.reload();
+    });
+}
+
+function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
 </script>
