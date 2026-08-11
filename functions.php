@@ -32,12 +32,12 @@ add_action('after_setup_theme', function() {
     add_theme_support('post-thumbnails');
 });
 
-// Setup DB and Roles on Init
+// Setup DB, Roles, and Router on Init (Priority 5)
 add_action('init', function() {
     VICOBA_DB::init_db();
     VICOBA_Roles::setup_roles();
     VICOBA_Router::init();
-});
+}, 5);
 
 // Register REST API Routes
 add_action('rest_api_init', function() {
@@ -46,10 +46,10 @@ add_action('rest_api_init', function() {
 
 // Enqueue Scripts & Styles
 add_action('wp_enqueue_scripts', function() {
-    wp_enqueue_style('vicoba-theme-style', get_stylesheet_uri(), array(), '1.0.0');
-    wp_enqueue_style('vicoba-custom-css', get_template_directory_uri() . '/assets/css/vicoba-style.css', array(), '1.0.0');
+    wp_enqueue_style('vicoba-theme-style', get_stylesheet_uri(), array(), '1.0.1');
+    wp_enqueue_style('vicoba-custom-css', get_template_directory_uri() . '/assets/css/vicoba-style.css', array(), '1.0.1');
 
-    wp_enqueue_script('vicoba-app-js', get_template_directory_uri() . '/assets/js/vicoba-app.js', array('jquery'), '1.0.0', true);
+    wp_enqueue_script('vicoba-app-js', get_template_directory_uri() . '/assets/js/vicoba-app.js', array('jquery'), '1.0.1', true);
 
     $current_user = wp_get_current_user();
     $member = VICOBA_Members::get_member_by_user_id($current_user->ID);
