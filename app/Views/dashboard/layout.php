@@ -14,21 +14,6 @@
 <style>
   body { font-family:'Inter',sans-serif; }
   [x-cloak] { display:none !important; }
-  .sidebar-link { @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-150; }
-  .sidebar-link.active { @apply bg-blue-600 text-white shadow-lg shadow-blue-500/30; }
-  .stat-card { @apply bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition; }
-  .btn { @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200; }
-  .btn-primary { @apply btn bg-blue-600 hover:bg-blue-700 text-white shadow; }
-  .btn-secondary { @apply btn bg-slate-100 hover:bg-slate-200 text-slate-700; }
-  .btn-danger { @apply btn bg-red-600 hover:bg-red-700 text-white; }
-  .btn-success { @apply btn bg-emerald-600 hover:bg-emerald-700 text-white; }
-  .modal-overlay { @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4; }
-  .modal-box { @apply bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto; }
-  .form-label { @apply block text-sm font-semibold text-slate-700 mb-1; }
-  .form-input { @apply w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition; }
-  .badge { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border; }
-  .table-auto th { @apply text-xs font-semibold text-slate-500 uppercase tracking-wider py-3 px-4 text-left bg-slate-50 border-b; }
-  .table-auto td { @apply py-3 px-4 text-sm border-b border-slate-50; }
   .scrollbar-thin::-webkit-scrollbar { width:5px; height:5px; }
   .scrollbar-thin::-webkit-scrollbar-track { background:transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:9999px; }
@@ -57,7 +42,7 @@
   </div>
 
   <!-- Nav Links -->
-  <nav class="flex-1 overflow-y-auto scrollbar-thin px-3 py-4 space-y-0.5">
+  <nav class="flex-1 overflow-y-auto scrollbar-thin px-3 py-4 space-y-1.5 flex flex-col">
     <?php
     $role = $user->role;
     $links = [
@@ -79,9 +64,9 @@
       $isActive = $current_view === $l['view'];
     ?>
     <a href="/dashboard/<?= $l['view'] ?>"
-       class="sidebar-link <?= $isActive ? 'active' : '' ?>">
-      <span><?= $l['icon'] ?></span>
-      <span><?= $l['label'] ?></span>
+       class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 <?= $isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 font-semibold' : 'text-slate-300 hover:bg-white/10 hover:text-white' ?>">
+      <span class="text-base flex-shrink-0"><?= $l['icon'] ?></span>
+      <span class="truncate"><?= $l['label'] ?></span>
     </a>
     <?php endforeach; ?>
   </nav>

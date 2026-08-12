@@ -34,12 +34,14 @@ class DashboardController
             Response::redirect('/dashboard/overview');
         }
 
-        $member = null;
-        $group  = null;
+        $group_id = $user->group_id;
+        if (!$group_id) {
+            $group_id = (int) Database::scalar('SELECT id FROM ' . Database::t('groups') . ' ORDER BY id ASC LIMIT 1');
+        }
 
-        if ($user->group_id) {
+        if ($group_id) {
             $member = Database::get('SELECT * FROM ' . Database::t('members') . ' WHERE user_id = ?', [$user->id]);
-            $group  = Database::get('SELECT * FROM ' . Database::t('groups') . ' WHERE id = ?', [$user->group_id]);
+            $group  = Database::get('SELECT * FROM ' . Database::t('groups') . ' WHERE id = ?', [$group_id]);
         }
 
         // Unread notifications count
