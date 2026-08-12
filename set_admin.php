@@ -4,7 +4,7 @@
  * Generates a clean BCRYPT password hash for 'Admin@1234' using PHP password_hash()
  */
 
-define('ROOT_PATH', dirname(__DIR__));
+define('ROOT_PATH', __DIR__);
 define('APP_PATH',  ROOT_PATH . '/app');
 define('CONFIG_PATH', ROOT_PATH . '/config');
 
