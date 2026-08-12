@@ -40,9 +40,31 @@
         <template x-for="m in members" :key="m.id"><option :value="m.id" x-text="m.full_name + ' (' + m.member_number + ')'"></option></template>
       </select>
     </div>
-    <a :href="'/export/statement-csv?group_id=<?= $group_id ?>&member_id=' + selectedMember" target="_blank" class="w-full btn btn-success justify-center" :class="{'opacity-50 pointer-events-none': !selectedMember}">
-      📥 Pakua Statement (CSV)
-    </a>
+    <div class="grid grid-cols-2 gap-2">
+      <a :href="'/export/statement-csv?group_id=<?= $group_id ?>&member_id=' + selectedMember" target="_blank" class="w-full btn btn-secondary text-xs justify-center" :class="{'opacity-50 pointer-events-none': !selectedMember}">
+        📥 CSV Statement
+      </a>
+      <a :href="'/export/statement-pdf?group_id=<?= $group_id ?>&member_id=' + selectedMember" target="_blank" class="w-full btn btn-success text-xs justify-center" :class="{'opacity-50 pointer-events-none': !selectedMember}">
+        📄 PDF Statement
+      </a>
+    </div>
+  </div>
+
+  <!-- Annual Regulatory Report Card -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4 md:col-span-2">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">🏛️</div>
+      <div>
+        <h3 class="font-bold text-slate-800">Ripoti ya Mwaka ya Serikali (Annual Regulatory PDF Report)</h3>
+        <p class="text-xs text-slate-500">Ripoti rasmi iliyosanifiwa kulingana na miongozo ya Halmashauri na Wizara ya Maendeleo ya Jamii</p>
+      </div>
+    </div>
+    <div class="flex justify-end">
+      <a href="/export/annual-report-pdf?group_id=<?= $group_id ?>" target="_blank" class="btn btn-primary">
+        📄 Pakua Ripoti ya Mwaka (Official PDF)
+      </a>
+    </div>
+  </div>
   </div>
 
 </div>

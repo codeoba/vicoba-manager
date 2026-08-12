@@ -10,6 +10,33 @@ $share_monthly = array_reverse($share_monthly);
 ?>
 <div class="space-y-6">
 
+<!-- 📊 FINANCIAL HEALTH SCORE BANNER -->
+<div class="bg-gradient-to-r from-blue-900 via-slate-900 to-indigo-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
+  <div class="absolute -right-6 -bottom-6 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl"></div>
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider <?= $stats['risk_level']==='LOW'?'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30':($stats['risk_level']==='MEDIUM'?'bg-amber-500/20 text-amber-300 border border-amber-500/30':'bg-red-500/20 text-red-300 border border-red-500/30') ?>">
+          Hatari: <?= $stats['risk_level'] ?> RISK
+        </span>
+        <span class="text-xs text-slate-300">Kipimo cha Afya ya Kifedha ya Kikundi</span>
+      </div>
+      <h2 class="text-2xl font-black text-white">Index ya Afya ya Kikundi (Health Index)</h2>
+      <p class="text-xs text-slate-300">Inapigwa hesabu kutoka Ulipaji wa Mikopo (<?= $stats['repayment_rate'] ?>%), NPL Ratio (<?= $stats['npl_rate'] ?>%), na Ukuaji wa Hisa.</p>
+    </div>
+
+    <!-- Health Score Badge -->
+    <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 flex-shrink-0">
+      <div class="text-center">
+        <p class="text-xs font-bold text-slate-300 uppercase tracking-wider">Health Score</p>
+        <p class="text-4xl font-black <?= $stats['health_score']>=80?'text-emerald-400':($stats['health_score']>=50?'text-amber-400':'text-red-400') ?>">
+          <?= $stats['health_score'] ?><span class="text-lg font-normal text-slate-400">/100</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Stats Grid -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
   <div class="stat-card">

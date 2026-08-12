@@ -20,7 +20,10 @@ require APP_PATH . '/Core/Auth.php';
 require APP_PATH . '/Core/Router.php';
 require APP_PATH . '/Core/Response.php';
 
-// ── Autoload Models ────────────────────────────────────────────────────────────
+// ── Autoload Services & Models ──────────────────────────────────────────────────
+foreach (glob(APP_PATH . '/Services/*.php') as $svc) {
+    require $svc;
+}
 foreach (glob(APP_PATH . '/Models/*.php') as $model) {
     require $model;
 }
@@ -115,7 +118,11 @@ Router::post('/api/notifications/mark-read', [ApiController::class, 'markNotific
 Router::get ('/api/reports/summary',    [ApiController::class, 'getReportsSummary']);
 Router::get ('/export/ledger-csv',      [ApiController::class, 'exportLedgerCsv']);
 Router::get ('/export/statement-csv',   [ApiController::class, 'exportStatementCsv']);
+Router::get ('/export/statement-pdf',   [ApiController::class, 'exportStatementPdf']);
+Router::get ('/export/annual-report-pdf',[ApiController::class, 'exportAnnualReportPdf']);
 Router::get ('/export/shareout-csv',    [ApiController::class, 'exportShareoutCsv']);
+Router::post('/api/loans/send-otp',     [ApiController::class, 'sendDisbursementOtp']);
+Router::post('/api/loans/verify-otp',   [ApiController::class, 'verifyDisbursementOtp']);
 
 // --- REST API: Super Admin ---
 Router::get ('/api/superadmin/groups',       [ApiController::class, 'superAdminGetGroups']);

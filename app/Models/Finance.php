@@ -66,13 +66,35 @@ class Reports {
 
         $total_shares  = (float)\Database::scalar("SELECT COALESCE(SUM(total_amount),0) FROM $t_shares WHERE group_id=?$date_cond", $params);
         $active_loans  = (float)\Database::scalar("SELECT COALESCE(SUM(balance_remaining),0) FROM $t_loans WHERE group_id=? AND status IN ('active','overdue')", [$group_id]);
+        $total_borrowed= (float)\Database::scalar("SELECT COALESCE(SUM(principal_amount),0) FROM $t_loans WHERE group_id=? AND status IN ('active','overdue','completed')", [$group_id]);
+        $total_repaid  = (float)\Database::scalar("SELECT COALESCE(SUM(amount_paid),0) FROM $t_loans WHERE group_id=? AND status IN ('active','overdue','completed')", [$group_id]);
         $fines_pending = (float)\Database::scalar("SELECT COALESCE(SUM(amount),0) FROM $t_fines WHERE group_id=? AND status='pending'", [$group_id]);
         $fines_paid    = (float)\Database::scalar("SELECT COALESCE(SUM(amount),0) FROM $t_fines WHERE group_id=? AND status='paid'", [$group_id]);
         $member_count  = (int)\Database::scalar("SELECT COUNT(*) FROM $t_members WHERE group_id=? AND status='active'", [$group_id]);
+        $total_loan_count = (int)\Database::scalar("SELECT COUNT(*) FROM $t_loans WHERE group_id=? AND status IN ('active','overdue')", [$group_id]);
         $overdue_loans = (int)\Database::scalar("SELECT COUNT(*) FROM $t_loans WHERE group_id=? AND status='overdue'", [$group_id]);
         $balance = Ledger::getBalance($group_id);
 
-        return compact('total_shares','active_loans','fines_pending','fines_paid','member_count','overdue_loans','balance');
+        // Repayment Rate
+        $repayment_rate = $total_borrowed > 0 ? round(($total_repaid / $total_borrowed) * 100, 1) : 100;
+
+        // NPL Rate (Non-performing loan ratio)
+        $npl_rate = $total_loan_count > 0 ? round(($overdue_loans / $total_loan_count) * 100, 1) : 0;
+
+        // Calculate Financial Health Score (0 - 100)
+        $health_score = 100;
+        if ($npl_rate > 0) $health_score -= ($npl_rate * 1.5);
+        if ($repayment_rate < 90) $health_score -= ((90 - $repayment_rate) * 0.8);
+        if ($member_count < 5) $health_score -= 10;
+        $health_score = max(10, min(100, (int)round($health_score)));
+
+        $risk_level = match(true) {
+            $health_score >= 80 => 'LOW',
+            $health_score >= 50 => 'MEDIUM',
+            default             => 'HIGH'
+        };
+
+        return compact('total_shares','active_loans','fines_pending','fines_paid','member_count','overdue_loans','balance','health_score','risk_level','npl_rate','repayment_rate');
     }
 }
 

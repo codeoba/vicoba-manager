@@ -515,12 +515,64 @@ class ApiController
         $this->json(['success' => true, 'message' => 'Umeingia!', 'role' => $user->role, 'group_id' => $user->group_id]);
     }
 
-    public function registerGroup(array $p = []): never
+    public function exportStatementPdf(array $p = []): never
     {
+        $user = $this->requireAuth();
+        $member_id = (int)($_GET['member_id'] ?? 0);
+        $group_id = $this->groupId($user);
+
+        $member = Database::get('SELECT * FROM ' . Database::t('members') . ' WHERE id=? AND group_id=?', [$member_id, $group_id]);
+        if (!$member) {
+            die('Mwanachama hakupatikana.');
+        }
+
+        $group = Database::get('SELECT * FROM ' . Database::t('groups') . ' WHERE id=?', [$group_id]);
+        $transactions = Database::all('SELECT * FROM ' . Database::t('transactions') . ' WHERE group_id=? AND member_id=? ORDER BY created_at DESC', [$group_id, $member_id]);
+
+        include VIEW_PATH . '/pdf/statement.php';
+        exit;
+    }
+
+    public function exportAnnualReportPdf(array $p = []): never
+    {
+        $user = $this->requireAuth();
+        $group_id = $this->groupId($user);
+
+        $group = Database::get('SELECT * FROM ' . Database::t('groups') . ' WHERE id=?', [$group_id]);
+        $stats = \Models\Reports::getSummary($group_id);
+
+        include VIEW_PATH . '/pdf/annual_report.php';
+        exit;
+    }
+
+    public function sendDisbursementOtp(array $p = []): never
+    {
+        $user = $this->requireRole('super_admin', 'group_admin', 'treasurer');
+        $otp = (string)rand(100000, 999999);
+        $_SESSION['disburse_otp'] = $otp;
+        $_SESSION['disburse_otp_expires'] = time() + 300; // 5 min
+
+        // Send OTP via SMS
+        $phone = $user->phone ?? '0700000000';
+        \Services\SmsService::send($phone, "Namba yako ya siri ya kuthibitisha kutoa mkopo (OTP) ni: $otp. Ni halali kwa dakika 5.");
+
+        $this.json(['success' => true, 'message' => 'OTP imetumwa kwenye simu yako!']);
+    }
+
+    public function verifyDisbursementOtp(array $p = []): never
+    {
+        $this->requireRole('super_admin', 'group_admin', 'treasurer');
         $body = $this->body();
-        // Delegate to AuthController logic
-        $ctrl = new AuthController();
-        $_POST = $body;
-        $ctrl->registerPost([]);
+        $input_otp = trim($body['otp'] ?? '');
+
+        $stored_otp = $_SESSION['disburse_otp'] ?? '';
+        $expires = $_SESSION['disburse_otp_expires'] ?? 0;
+
+        if (empty($input_otp) || $input_otp !== $stored_otp || time() > $expires) {
+            $this.json(['success' => false, 'message' => 'OTP si sahihi au imepitwa na wakati.'], 422);
+        }
+
+        unset($_SESSION['disburse_otp'], $_SESSION['disburse_otp_expires']);
+        $this.json(['success' => true, 'message' => 'OTP imethibitishwa kikamilifu!']);
     }
 }
