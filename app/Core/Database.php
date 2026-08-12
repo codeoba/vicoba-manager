@@ -92,8 +92,11 @@ class Database
     /** Get fully-qualified table name with prefix */
     public static function table(string $name): string
     {
+        if (self::$pdo === null) {
+            self::connect();
+        }
         // If already prefixed, don't double-prefix
-        if (str_starts_with($name, self::$prefix)) return $name;
+        if (self::$prefix !== '' && str_starts_with($name, self::$prefix)) return $name;
         return self::$prefix . $name;
     }
 
