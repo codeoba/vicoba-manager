@@ -184,13 +184,14 @@
   <main class="flex-1 p-4 sm:p-6">
     <?php
     $view_file = VIEW_PATH . '/dashboard/' . $current_view . '.php';
-    if (file_exists($view_file)) include $view_file;
-    else: ?>
+    if (file_exists($view_file)) {
+        include $view_file;
+    } else { ?>
     <div class="text-center py-20 text-slate-400">
       <p class="text-4xl mb-2">🚧</p>
       <p class="font-semibold">Kipengele hiki kinaandaliwa...</p>
     </div>
-    <?php endif; ?>
+    <?php } ?>
   </main>
 </div>
 
