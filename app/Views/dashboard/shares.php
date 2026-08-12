@@ -1,6 +1,4 @@
-<?php
-$group_id = (int)($group->id ?? 0);
-?>
+<?php $group_id = (int)($group->id ?? 0); ?>
 <div x-data="sharesPage()" x-init="load()">
 
 <!-- Header -->
@@ -10,26 +8,26 @@ $group_id = (int)($group->id ?? 0);
     <p class="text-sm text-slate-500 mt-0.5">Simamia ununuzi na michango ya hisa za wanachama</p>
   </div>
   <?php if(in_array($user->role,['super_admin','group_admin','treasurer','secretary'])): ?>
-  <button @click="showModal('record-share-modal')" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow transition">
-    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-    Rekodi Hisa Mpya
+  <button @click="showModal('record-share-modal')" class="btn btn-primary">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+    <span>Rekodi Hisa Mpya</span>
   </button>
   <?php endif; ?>
 </div>
 
 <!-- Stats row -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-  <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+  <div class="stat-card">
     <p class="text-xs font-semibold text-slate-400 uppercase">Jumla ya Hisa (Pool)</p>
     <p class="text-3xl font-extrabold text-blue-600 mt-1" x-text="money(total_pool)"></p>
     <p class="text-xs text-slate-400 mt-1">Mtaji wote wa kikundi</p>
   </div>
-  <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+  <div class="stat-card">
     <p class="text-xs font-semibold text-slate-400 uppercase">Hisa Mwezi Huu</p>
     <p class="text-3xl font-extrabold text-emerald-600 mt-1" x-text="money(this_month)"></p>
     <p class="text-xs text-slate-400 mt-1">Michango ya mwezi wa sasa</p>
   </div>
-  <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+  <div class="stat-card">
     <p class="text-xs font-semibold text-slate-400 uppercase">Bei ya Hisa Moja</p>
     <p class="text-3xl font-extrabold text-slate-800 mt-1"><?= money($group->share_price ?? 1000) ?></p>
     <p class="text-xs text-slate-400 mt-1">Kiwango kilichopangwa</p>
@@ -101,8 +99,8 @@ $group_id = (int)($group->id ?? 0);
 <div id="record-share-modal" class="modal-overlay hidden">
   <div class="modal-box">
     <div class="flex items-center justify-between px-6 py-4 border-b">
-      <h3 class="font-bold text-slate-800">Rekodi Ununuzi wa Hisa</h3>
-      <button @click="hideModal('record-share-modal')" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
+      <h3 class="font-bold text-slate-800 text-base">Rekodi Ununuzi wa Hisa</h3>
+      <button @click="hideModal('record-share-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
     </div>
     <form @submit.prevent="recordShare" class="px-6 py-4 space-y-4">
       <div>
@@ -136,11 +134,11 @@ $group_id = (int)($group->id ?? 0);
         <input x-model="form.payment_date" type="date" class="form-input">
       </div>
 
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" @click="hideModal('record-share-modal')" class="btn-secondary">Ghairi</button>
-        <button type="submit" class="btn-primary" :disabled="saving">
-          <template x-if="saving">⏳ Inahifadhi...</template>
-          <template x-if="!saving">💾 Rekodi Hisa</template>
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button type="button" @click="hideModal('record-share-modal')" class="btn btn-secondary">Ghairi</button>
+        <button type="submit" class="btn btn-primary" :disabled="saving">
+          <template x-if="saving"><span>⏳ Inahifadhi...</span></template>
+          <template x-if="!saving"><span>💾 Rekodi Hisa</span></template>
         </button>
       </div>
     </form>

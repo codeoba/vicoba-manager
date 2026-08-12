@@ -42,9 +42,9 @@
     </div>
 
     <div class="pt-4 border-t flex justify-end">
-      <button type="submit" class="btn-primary" :disabled="saving">
-        <template x-if="saving">⏳ Inahifadhi...</template>
-        <template x-if="!saving">💾 Hifadhi Mipangilio</template>
+      <button type="submit" class="btn btn-primary" :disabled="saving">
+        <template x-if="saving"><span>⏳ Inahifadhi...</span></template>
+        <template x-if="!saving"><span>💾 Hifadhi Mipangilio</span></template>
       </button>
     </div>
   </form>

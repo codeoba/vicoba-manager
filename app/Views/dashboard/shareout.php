@@ -3,7 +3,7 @@
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
   <div><h1 class="text-2xl font-extrabold text-slate-800">Mgawanyo wa Mwaka (Share-Out)</h1><p class="text-sm text-slate-500 mt-0.5">Hesabu na ugawa hisa, faida ya riba, na faini kwa wanachama mwisho wa mzunguko</p></div>
   <?php if(in_array($user->role,['super_admin','group_admin','treasurer'])): ?>
-  <button @click="showModal('finalize-shareout-modal')" class="btn-primary">🎯 Anzisha Mgawanyo Mpya</button>
+  <button @click="showModal('finalize-shareout-modal')" class="btn btn-primary">🎯 Anzisha Mgawanyo Mpya</button>
   <?php endif; ?>
 </div>
 
@@ -17,14 +17,17 @@
 <!-- FINALIZE MODAL -->
 <div id="finalize-shareout-modal" class="modal-overlay hidden">
   <div class="modal-box">
-    <div class="flex items-center justify-between px-6 py-4 border-b"><h3 class="font-bold text-slate-800">Fanya Mgawanyo wa Kikundi</h3><button @click="hideModal('finalize-shareout-modal')" class="text-slate-400 text-xl">&times;</button></div>
+    <div class="flex items-center justify-between px-6 py-4 border-b">
+      <h3 class="font-bold text-slate-800 text-base">Fanya Mgawanyo wa Kikundi</h3>
+      <button @click="hideModal('finalize-shareout-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+    </div>
     <form @submit.prevent="submitShareout" class="px-6 py-4 space-y-4">
       <div><label class="form-label">Tarehe ya Mgawanyo</label><input x-model="form.shareout_date" type="date" required class="form-input"></div>
       <div><label class="form-label">Gharama za Uendeshaji (Operating Costs - TZS)</label><input x-model.number="form.operating_costs" type="number" class="form-input" placeholder="0"></div>
       <div><label class="form-label">Akiba ya Madeni Mabaya (Bad Debt Provision - TZS)</label><input x-model.number="form.bad_debt_provision" type="number" class="form-input" placeholder="0"></div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" @click="hideModal('finalize-shareout-modal')" class="btn-secondary">Ghairi</button>
-        <button type="submit" class="btn-primary" :disabled="saving">🎯 Kaza & Hakiki Mgawanyo</button>
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button type="button" @click="hideModal('finalize-shareout-modal')" class="btn btn-secondary">Ghairi</button>
+        <button type="submit" class="btn btn-primary" :disabled="saving">🎯 Kaza & Hakiki Mgawanyo</button>
       </div>
     </form>
   </div>

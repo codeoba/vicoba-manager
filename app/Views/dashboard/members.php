@@ -1,6 +1,4 @@
-<?php
-$group_id = (int)($group->id ?? 0);
-?>
+<?php $group_id = (int)($group->id ?? 0); ?>
 <div x-data="membersPage()" x-init="load()">
 
 <!-- Header -->
@@ -10,16 +8,16 @@ $group_id = (int)($group->id ?? 0);
     <p class="text-sm text-slate-500 mt-0.5">Simamia wanachama wa kikundi</p>
   </div>
   <?php if(in_array($user->role,['super_admin','group_admin','secretary'])): ?>
-  <button @click="showModal('add-member-modal')" class="btn-primary">
-    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-    Ongeza Mwanachama
+  <button @click="showModal('add-member-modal')" class="btn btn-primary">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+    <span>Ongeza Mwanachama</span>
   </button>
   <?php endif; ?>
 </div>
 
 <!-- Search -->
 <div class="mb-4">
-  <input type="search" x-model="search" placeholder="Tafuta kwa jina, namba ya simu..." class="form-input max-w-sm">
+  <input type="search" x-model="search" placeholder="🔍 Tafuta kwa jina, namba ya simu..." class="form-input max-w-sm">
 </div>
 
 <!-- Stats row -->
@@ -64,10 +62,10 @@ $group_id = (int)($group->id ?? 0);
             <td class="text-slate-500 text-xs" x-text="m.joined_date||'—'"></td>
             <?php if(in_array($user->role,['super_admin','group_admin','secretary','treasurer'])): ?>
             <td>
-              <div class="flex items-center gap-1">
-                <button @click="editMember(m)" class="btn-secondary text-xs py-1 px-2">✏️</button>
-                <button @click="changeStatus(m)" class="btn-secondary text-xs py-1 px-2">🔄</button>
-                <button @click="changeRole(m)" class="btn-secondary text-xs py-1 px-2">🎭</button>
+              <div class="flex items-center gap-1.5">
+                <button @click="editMember(m)" class="btn btn-secondary text-xs px-2.5 py-1" title="Hariri">✏️ Hariri</button>
+                <button @click="changeStatus(m)" class="btn btn-secondary text-xs px-2.5 py-1" title="Hali">🔄 Hali</button>
+                <button @click="changeRole(m)" class="btn btn-secondary text-xs px-2.5 py-1" title="Jukumu">🎭 Jukumu</button>
               </div>
             </td>
             <?php endif; ?>
@@ -82,8 +80,8 @@ $group_id = (int)($group->id ?? 0);
 <div id="add-member-modal" class="modal-overlay hidden">
   <div class="modal-box">
     <div class="flex items-center justify-between px-6 py-4 border-b">
-      <h3 class="font-bold text-slate-800">Ongeza Mwanachama Mpya</h3>
-      <button @click="hideModal('add-member-modal')" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
+      <h3 class="font-bold text-slate-800 text-base">Ongeza Mwanachama Mpya</h3>
+      <button @click="hideModal('add-member-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
     </div>
     <form @submit.prevent="addMember" class="px-6 py-4 space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -106,11 +104,11 @@ $group_id = (int)($group->id ?? 0);
         <div><label class="form-label">Simu ya Dharura</label><input x-model="form.emergency_phone" type="tel" class="form-input"></div>
         <div class="sm:col-span-2"><label class="form-label">Nywila ya Akaunti</label><input x-model="form.password" type="password" class="form-input" placeholder="Atatumiwa au atumiwe mwenyewe (min 8)"></div>
       </div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" @click="hideModal('add-member-modal')" class="btn-secondary">Ghairi</button>
-        <button type="submit" class="btn-primary" :disabled="saving">
-          <template x-if="saving">⏳ Inahifadhi...</template>
-          <template x-if="!saving">💾 Hifadhi</template>
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button type="button" @click="hideModal('add-member-modal')" class="btn btn-secondary">Ghairi</button>
+        <button type="submit" class="btn btn-primary" :disabled="saving">
+          <template x-if="saving"><span>⏳ Inahifadhi...</span></template>
+          <template x-if="!saving"><span>💾 Hifadhi Mwanachama</span></template>
         </button>
       </div>
     </form>
@@ -141,7 +139,6 @@ function membersPage() {
     },
     editMember(m) { this.form = {...m}; showModal('add-member-modal'); },
     async changeStatus(m) {
-      const statuses = ['active','suspended','alumni'].filter(s=>s!==m.status);
       const {value} = await Swal.fire({title:'Badilisha Hali',input:'select',inputOptions:{active:'Active',suspended:'Suspended',alumni:'Alumni'},inputValue:m.status,showCancelButton:true,confirmButtonColor:'#2563eb'});
       if(value) { await api('/api/members/update-status','POST',{member_id:m.id,status:value}); this.load(); }
     },

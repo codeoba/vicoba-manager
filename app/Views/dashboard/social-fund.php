@@ -3,8 +3,8 @@
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
   <div><h1 class="text-2xl font-extrabold text-slate-800">Mfuko wa Jamii (Social Fund)</h1><p class="text-sm text-slate-500 mt-0.5">Michango na usaidizi wa majanga, msiba au sherehe za wanachama</p></div>
   <div class="flex gap-2">
-    <button @click="showModal('contribute-modal')" class="btn-primary">❤️ Weka Mchango</button>
-    <button @click="showModal('request-modal')" class="btn-secondary">🆘 Omba Usaidizi</button>
+    <button @click="showModal('contribute-modal')" class="btn btn-primary">❤️ Weka Mchango</button>
+    <button @click="showModal('request-modal')" class="btn btn-secondary">🆘 Omba Usaidizi</button>
   </div>
 </div>
 
@@ -37,7 +37,10 @@
 <!-- CONTRIBUTE MODAL -->
 <div id="contribute-modal" class="modal-overlay hidden">
   <div class="modal-box">
-    <div class="flex items-center justify-between px-6 py-4 border-b"><h3 class="font-bold text-slate-800">Rekodi Mchango wa Jamii</h3><button @click="hideModal('contribute-modal')" class="text-slate-400 text-xl">&times;</button></div>
+    <div class="flex items-center justify-between px-6 py-4 border-b">
+      <h3 class="font-bold text-slate-800 text-base">Rekodi Mchango wa Jamii</h3>
+      <button @click="hideModal('contribute-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+    </div>
     <form @submit.prevent="submitContribute" class="px-6 py-4 space-y-4">
       <div>
         <label class="form-label">Mwanachama</label>
@@ -48,9 +51,9 @@
       </div>
       <div><label class="form-label">Kiasi (TZS) *</label><input x-model.number="contribForm.amount" type="number" min="500" required class="form-input" placeholder="1000"></div>
       <div><label class="form-label">Sababu</label><input x-model="contribForm.reason" type="text" class="form-input" placeholder="Mchango wa mwezi"></div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" @click="hideModal('contribute-modal')" class="btn-secondary">Ghairi</button>
-        <button type="submit" class="btn-primary" :disabled="saving">💾 Hifadhi Mchango</button>
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button type="button" @click="hideModal('contribute-modal')" class="btn btn-secondary">Ghairi</button>
+        <button type="submit" class="btn btn-primary" :disabled="saving">💾 Hifadhi Mchango</button>
       </div>
     </form>
   </div>

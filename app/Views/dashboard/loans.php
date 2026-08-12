@@ -1,6 +1,4 @@
-<?php
-$group_id = (int)($group->id ?? 0);
-?>
+<?php $group_id = (int)($group->id ?? 0); ?>
 <div x-data="loansPage()" x-init="load()">
 
 <!-- Header -->
@@ -10,9 +8,9 @@ $group_id = (int)($group->id ?? 0);
     <p class="text-sm text-slate-500 mt-0.5">Omba, idhinisha, toa na urekodi marejesho ya mikopo</p>
   </div>
   <div class="flex items-center gap-2">
-    <button @click="showModal('apply-loan-modal')" class="btn-primary">
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-      Omba Mkopo Mpya
+    <button @click="showModal('apply-loan-modal')" class="btn btn-primary">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      <span>Omba Mkopo Mpya</span>
     </button>
   </div>
 </div>
@@ -61,16 +59,16 @@ $group_id = (int)($group->id ?? 0);
             <td class="py-3.5 px-4 text-xs text-slate-500" x-text="l.due_date||'—'"></td>
             <td class="py-3.5 px-4 text-right">
               <div class="flex items-center justify-end gap-1.5">
-                <button @click="viewSchedule(l)" class="btn-secondary text-xs py-1 px-2.5" title="Ratiba">📅 Schedule</button>
+                <button @click="viewSchedule(l)" class="btn btn-secondary text-xs py-1 px-2.5" title="Ratiba">📅 Schedule</button>
 
                 <!-- Repay button for active/overdue -->
                 <template x-if="['active','overdue'].includes(l.status) && canManage">
-                  <button @click="repayModal(l)" class="btn-primary text-xs py-1 px-2.5">💵 Lipa</button>
+                  <button @click="repayModal(l)" class="btn btn-primary text-xs py-1 px-2.5">💵 Lipa</button>
                 </template>
 
                 <!-- Disburse button for pending -->
                 <template x-if="['pending_treasurer','pending_chairman'].includes(l.status) && canManage">
-                  <button @click="disburseModal(l)" class="btn-success text-xs py-1 px-2.5">✅ Toa Mkopo</button>
+                  <button @click="disburseModal(l)" class="btn btn-success text-xs py-1 px-2.5">✅ Toa Mkopo</button>
                 </template>
               </div>
             </td>
@@ -85,8 +83,8 @@ $group_id = (int)($group->id ?? 0);
 <div id="apply-loan-modal" class="modal-overlay hidden">
   <div class="modal-box">
     <div class="flex items-center justify-between px-6 py-4 border-b">
-      <h3 class="font-bold text-slate-800">Wasilisha Ombi la Mkopo</h3>
-      <button @click="hideModal('apply-loan-modal')" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
+      <h3 class="font-bold text-slate-800 text-base">Wasilisha Ombi la Mkopo</h3>
+      <button @click="hideModal('apply-loan-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
     </div>
     <form @submit.prevent="applyLoan" class="px-6 py-4 space-y-4">
       <div>
@@ -117,11 +115,11 @@ $group_id = (int)($group->id ?? 0);
         <textarea x-model="form.purpose" rows="2" class="form-input" placeholder="Mfano: Biashara ya duka, kilimo..."></textarea>
       </div>
 
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" @click="hideModal('apply-loan-modal')" class="btn-secondary">Ghairi</button>
-        <button type="submit" class="btn-primary" :disabled="saving">
-          <template x-if="saving">⏳ Inawasilisha...</template>
-          <template x-if="!saving">🚀 Wasilisha Ombi</template>
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button type="button" @click="hideModal('apply-loan-modal')" class="btn btn-secondary">Ghairi</button>
+        <button type="submit" class="btn btn-primary" :disabled="saving">
+          <template x-if="saving"><span>⏳ Inawasilisha...</span></template>
+          <template x-if="!saving"><span>🚀 Wasilisha Ombi</span></template>
         </button>
       </div>
     </form>
@@ -132,8 +130,8 @@ $group_id = (int)($group->id ?? 0);
 <div id="repay-loan-modal" class="modal-overlay hidden">
   <div class="modal-box">
     <div class="flex items-center justify-between px-6 py-4 border-b">
-      <h3 class="font-bold text-slate-800">Rekodi Rejesho la Mkopo</h3>
-      <button @click="hideModal('repay-loan-modal')" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
+      <h3 class="font-bold text-slate-800 text-base">Rekodi Rejesho la Mkopo</h3>
+      <button @click="hideModal('repay-loan-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
     </div>
     <form @submit.prevent="submitRepayment" class="px-6 py-4 space-y-4">
       <div class="p-3 bg-amber-50 rounded-xl border border-amber-100 text-xs text-amber-800 space-y-1">
@@ -157,9 +155,9 @@ $group_id = (int)($group->id ?? 0);
         <input x-model="repayForm.payment_date" type="date" class="form-input">
       </div>
 
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" @click="hideModal('repay-loan-modal')" class="btn-secondary">Ghairi</button>
-        <button type="submit" class="btn-primary" :disabled="saving">💾 Rekodi Rejesho</button>
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button type="button" @click="hideModal('repay-loan-modal')" class="btn btn-secondary">Ghairi</button>
+        <button type="submit" class="btn btn-primary" :disabled="saving">💾 Rekodi Rejesho</button>
       </div>
     </form>
   </div>

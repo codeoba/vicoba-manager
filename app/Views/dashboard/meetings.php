@@ -3,9 +3,9 @@
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
   <div><h1 class="text-2xl font-extrabold text-slate-800">Mikutano na Mahudhurio</h1><p class="text-sm text-slate-500 mt-0.5">Ratibu mikutano, rekodi mahudhurio, na hifadhi muhtasari (minutes)</p></div>
   <?php if(in_array($user->role,['super_admin','group_admin','secretary'])): ?>
-  <button @click="showModal('create-meeting-modal')" class="btn-primary">
-    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-    Ratibu Mkutano Mpya
+  <button @click="showModal('create-meeting-modal')" class="btn btn-primary">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    <span>Ratibu Mkutano Mpya</span>
   </button>
   <?php endif; ?>
 </div>
@@ -23,8 +23,8 @@
         <p class="text-xs text-slate-600 mt-2" x-text="'📝 Agenda: ' + (m.agenda||'Bila agenda')"></p>
       </div>
       <div class="pt-3 border-t flex items-center justify-between gap-2">
-        <button @click="openMinutesModal(m)" class="btn-secondary text-xs">📖 Muhtasari (Minutes)</button>
-        <button @click="openAttendanceModal(m)" class="btn-primary text-xs">👥 Mahudhurio</button>
+        <button @click="openMinutesModal(m)" class="btn btn-secondary text-xs">📖 Muhtasari (Minutes)</button>
+        <button @click="openAttendanceModal(m)" class="btn btn-primary text-xs">👥 Mahudhurio</button>
       </div>
     </div>
   </template>
@@ -33,14 +33,17 @@
 <!-- CREATE MEETING MODAL -->
 <div id="create-meeting-modal" class="modal-overlay hidden">
   <div class="modal-box">
-    <div class="flex items-center justify-between px-6 py-4 border-b"><h3 class="font-bold text-slate-800">Ratibu Mkutano Mpya</h3><button @click="hideModal('create-meeting-modal')" class="text-slate-400 text-xl">&times;</button></div>
+    <div class="flex items-center justify-between px-6 py-4 border-b">
+      <h3 class="font-bold text-slate-800 text-base">Ratibu Mkutano Mpya</h3>
+      <button @click="hideModal('create-meeting-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+    </div>
     <form @submit.prevent="createMeeting" class="px-6 py-4 space-y-4">
       <div><label class="form-label">Tarehe ya Mkutano *</label><input x-model="form.meeting_date" type="date" required class="form-input"></div>
       <div><label class="form-label">Mahali pa Mkutano</label><input x-model="form.location" type="text" class="form-input" placeholder="Mfano: Ukumbi wa Ofisi"></div>
       <div><label class="form-label">Agenda kuu</label><textarea x-model="form.agenda" rows="3" class="form-input" placeholder="Orodhesha mada kuu..."></textarea></div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" @click="hideModal('create-meeting-modal')" class="btn-secondary">Ghairi</button>
-        <button type="submit" class="btn-primary" :disabled="saving">💾 Hifadhi Mkutano</button>
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button type="button" @click="hideModal('create-meeting-modal')" class="btn btn-secondary">Ghairi</button>
+        <button type="submit" class="btn btn-primary" :disabled="saving">💾 Hifadhi Mkutano</button>
       </div>
     </form>
   </div>

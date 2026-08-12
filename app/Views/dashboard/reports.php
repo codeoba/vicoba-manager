@@ -19,7 +19,7 @@
       <div><label class="form-label">Kuanzia Tarehe</label><input x-model="from" type="date" class="form-input"></div>
       <div><label class="form-label">Mpaka Tarehe</label><input x-model="to" type="date" class="form-input"></div>
     </div>
-    <a :href="'/export/ledger-csv?group_id=<?= $group_id ?>&from=' + (from||'') + '&to=' + (to||'')" target="_blank" class="w-full btn-primary justify-center">
+    <a :href="'/export/ledger-csv?group_id=<?= $group_id ?>&from=' + (from||'') + '&to=' + (to||'')" target="_blank" class="w-full btn btn-primary justify-center">
       📥 Pakua Daftari Kuu (CSV)
     </a>
   </div>
@@ -40,7 +40,7 @@
         <template x-for="m in members" :key="m.id"><option :value="m.id" x-text="m.full_name + ' (' + m.member_number + ')'"></option></template>
       </select>
     </div>
-    <a :href="'/export/statement-csv?group_id=<?= $group_id ?>&member_id=' + selectedMember" target="_blank" class="w-full btn-success justify-center" :class="{'opacity-50 pointer-events-none': !selectedMember}">
+    <a :href="'/export/statement-csv?group_id=<?= $group_id ?>&member_id=' + selectedMember" target="_blank" class="w-full btn btn-success justify-center" :class="{'opacity-50 pointer-events-none': !selectedMember}">
       📥 Pakua Statement (CSV)
     </a>
   </div>
