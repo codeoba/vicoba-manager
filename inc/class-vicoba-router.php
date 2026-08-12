@@ -13,6 +13,7 @@ class VICOBA_Router {
     public static function init() {
         add_action('init', array(__CLASS__, 'add_rewrite_rules'), 5);
         add_filter('query_vars', array(__CLASS__, 'add_query_vars'));
+        add_action('template_redirect', array('VICOBA_Export', 'handle_download_request'), 0);
         add_action('template_redirect', array(__CLASS__, 'dispatch_templates'), 1);
         add_action('admin_init', array(__CLASS__, 'restrict_admin_access'));
         add_filter('redirect_canonical', array(__CLASS__, 'prevent_canonical_redirect'), 10, 2);
@@ -37,12 +38,16 @@ class VICOBA_Router {
     }
 
     public static function prevent_canonical_redirect($redirect_url, $requested_url) {
+        if (isset($_GET['vicoba_export'])) {
+            return false;
+        }
         $path = parse_url($requested_url, PHP_URL_PATH);
         if ($path && (strpos($path, '/dashboard') !== false || strpos($path, '/login') !== false || strpos($path, '/register') !== false)) {
             return false;
         }
         return $redirect_url;
     }
+
 
     public static function add_query_vars($vars) {
         $vars[] = 'vicoba_route';

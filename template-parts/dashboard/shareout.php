@@ -141,17 +141,27 @@ $past_shareouts = $wpdb->get_results($wpdb->prepare(
                         <th class="py-3.5 px-4">Jumla ya Pool</th>
                         <th class="py-3.5 px-4">Wanachama Waliopewa</th>
                         <th class="py-3.5 px-4">Hali</th>
+                        <th class="py-3.5 px-4 text-right">Vitendo</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
                     <?php foreach ($past_shareouts as $so): ?>
+                    <?php
+                    $so_csv_url = VICOBA_Router::get_url('dashboard', 'shareout') . '&vicoba_export=shareout_csv&shareout_id=' . $so->id . '&group_id=' . $group_id;
+                    ?>
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="py-3.5 px-4 font-bold text-vicoba-800"><?php echo date('d M Y', strtotime($so->created_at)); ?></td>
-                        <td class="py-3.5 px-4 font-extrabold text-vicoba-700">TZS <?php echo number_format($so->total_pool ?? 0); ?></td>
+                        <td class="py-3.5 px-4 font-extrabold text-vicoba-700">TZS <?php echo number_format($so->total_shares_pool ?? 0); ?></td>
                         <td class="py-3.5 px-4"><?php echo (int)$so->dist_count; ?> wanachama</td>
                         <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">Imekamilika</span></td>
+                        <td class="py-3.5 px-4 text-right">
+                            <a href="<?php echo esc_url($so_csv_url); ?>" target="_blank" class="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs transition">
+                                <i class="fa-solid fa-file-csv mr-1"></i> Pakua CSV
+                            </a>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
+
                 </tbody>
             </table>
         </div>

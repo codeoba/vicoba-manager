@@ -63,22 +63,16 @@ if ($filter_member_id) {
         </div>
         <div class="flex gap-2 flex-wrap">
             <?php
-            $csv_base = add_query_arg([
-                'vicoba_export' => 'ledger_csv',
-                'from'          => $filter_from,
-                'to'            => $filter_to,
-            ], home_url('/'));
-            $stmt_csv = add_query_arg([
-                'vicoba_export' => 'member_statement_csv',
-                'member_id'     => $filter_member_id ?: ($member ? $member->id : 0),
-            ], home_url('/'));
+            $csv_base = VICOBA_Router::get_url('dashboard', 'reports') . '&vicoba_export=ledger_csv&from=' . urlencode($filter_from) . '&to=' . urlencode($filter_to) . '&group_id=' . $group_id;
+            $stmt_csv = VICOBA_Router::get_url('dashboard', 'reports') . '&vicoba_export=member_statement_csv&member_id=' . ($filter_member_id ?: ($member ? $member->id : 0)) . '&group_id=' . $group_id;
             ?>
-            <a href="<?php echo esc_url($csv_base); ?>" class="inline-flex items-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg transition">
+            <a href="<?php echo esc_url($csv_base); ?>" target="_blank" class="inline-flex items-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg transition">
                 <i class="fa-solid fa-file-csv mr-2"></i> Pakua Ledger (CSV)
             </a>
-            <a href="<?php echo esc_url($stmt_csv); ?>" class="inline-flex items-center px-3 py-2 rounded-xl bg-vicoba-600 hover:bg-vicoba-700 text-white font-bold text-xs shadow-lg transition">
+            <a href="<?php echo esc_url($stmt_csv); ?>" target="_blank" class="inline-flex items-center px-3 py-2 rounded-xl bg-vicoba-600 hover:bg-vicoba-700 text-white font-bold text-xs shadow-lg transition">
                 <i class="fa-solid fa-file-arrow-down mr-2"></i> Pakua Statement (CSV)
             </a>
+
             <button id="printReportBtn" onclick="window.print()" class="inline-flex items-center px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-lg transition">
                 <i class="fa-solid fa-print mr-2"></i> Chapisha
             </button>

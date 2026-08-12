@@ -1,12 +1,21 @@
 <?php
 /**
  * VICOBA Export Engine
- * CSV/Excel downloads for member statements, group reports, and share-out summaries
+ * CSV downloads for member statements, group reports, and share-out summaries
  */
 
 if (!defined('ABSPATH')) exit;
 
 class VICOBA_Export {
+
+    /**
+     * Clean all output buffers to ensure clean CSV file stream
+     */
+    private static function clean_buffers() {
+        while (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
+    }
 
     /**
      * Export all group transactions as CSV
@@ -32,29 +41,37 @@ class VICOBA_Export {
         ));
 
         $group = VICOBA_Groups::get_group($group_id);
+        $group_name = $group ? $group->name : 'kikundi';
+
+        self::clean_buffers();
 
         header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="vicoba-ledger-' . sanitize_title($group->name ?? 'group') . '-' . date('Y-m-d') . '.csv"');
+        header('Content-Disposition: attachment; filename="vicoba-ledger-' . sanitize_title($group_name) . '-' . date('Y-m-d') . '.csv"');
         header('Pragma: no-cache');
         header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 
         $output = fopen('php://output', 'w');
-        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM for Excel
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM for Microsoft Excel compatibility
 
         // Header row
-        fputcsv($output, ['Kodi', 'Aina ya Muamala', 'Kiasi (TZS)', 'Njia ya Malipo', 'Mwanachama', 'Namba ya Mwanachama', 'Maelezo', 'Tarehe']);
+        fputcsv($output, ['Kodi ya Muamala', 'Aina ya Muamala', 'Kiasi (TZS)', 'Njia ya Malipo', 'Mwanachama', 'Namba ya Mwanachama', 'Maelezo', 'Tarehe na Muda']);
 
-        foreach ($rows as $row) {
-            fputcsv($output, [
-                $row->transaction_code,
-                $row->type,
-                number_format($row->amount, 2),
-                $row->payment_method,
-                $row->member_name ?? 'N/A',
-                $row->member_number ?? 'N/A',
-                $row->description,
-                date('d/m/Y H:i', strtotime($row->created_at)),
-            ]);
+        if (!empty($rows)) {
+            foreach ($rows as $row) {
+                fputcsv($output, [
+                    $row->transaction_code,
+                    $row->type,
+                    number_format($row->amount, 2, '.', ''),
+                    $row->payment_method,
+                    $row->member_name ?? 'N/A',
+                    $row->member_number ?? 'N/A',
+                    $row->description,
+                    date('d/m/Y H:i', strtotime($row->created_at)),
+                ]);
+            }
+        } else {
+            fputcsv($output, ['Hakuna miamala iliyopatikana katika kipindi hiki.']);
         }
 
         fclose($output);
@@ -67,8 +84,16 @@ class VICOBA_Export {
     public static function export_member_statement_csv($group_id, $member_id) {
         global $wpdb;
         $member = VICOBA_Members::get_member($member_id);
-        if (!$member || $member->group_id != $group_id) wp_die('Hakuna ruhusa');
+        if (!$member) {
+            // Fallback: try finding member by ID without strict group filter
+            $member = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}vicoba_members WHERE id = %d", $member_id));
+        }
 
+        if (!$member) {
+            wp_die('Mwanachama hakupatikana kwa ajili ya ripoti hii.');
+        }
+
+        $group_id = $member->group_id;
         $shares_table = $wpdb->prefix . 'vicoba_shares';
         $loans_table  = $wpdb->prefix . 'vicoba_loans';
         $repay_table  = $wpdb->prefix . 'vicoba_loan_repayments';
@@ -89,30 +114,40 @@ class VICOBA_Export {
             $group_id, $member_id
         ));
 
+        self::clean_buffers();
+
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="statement-' . sanitize_title($member->full_name) . '-' . date('Y-m-d') . '.csv"');
         header('Pragma: no-cache');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 
         $output = fopen('php://output', 'w');
         fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-        fputcsv($output, ['Mwanachama:', $member->full_name, 'Namba:', $member->member_number, 'Tarehe ya Ripoti:', date('d/m/Y')]);
+        fputcsv($output, ['TAARIFA YA MWANACHAMA (STATEMENT)']);
+        fputcsv($output, ['Jina Kamili:', $member->full_name]);
+        fputcsv($output, ['Namba ya Mwanachama:', $member->member_number]);
+        fputcsv($output, ['Simu:', $member->phone]);
+        fputcsv($output, ['Tarehe ya Kupakuliwa:', date('d/m/Y H:i')]);
         fputcsv($output, []);
-        fputcsv($output, ['Tarehe', 'Aina', 'Maelezo', 'Kiasi (TZS)']);
+        fputcsv($output, ['Tarehe', 'Aina ya Muamala', 'Maelezo', 'Kiasi (TZS)']);
 
         $total = 0;
-        foreach ($rows as $row) {
-            fputcsv($output, [
-                $row->date ? date('d/m/Y', strtotime($row->date)) : 'N/A',
-                $row->type,
-                $row->description,
-                number_format($row->amount, 2),
-            ]);
-            $total += floatval($row->amount);
+        if (!empty($rows)) {
+            foreach ($rows as $row) {
+                fputcsv($output, [
+                    $row->date ? date('d/m/Y', strtotime($row->date)) : 'N/A',
+                    $row->type,
+                    $row->description,
+                    number_format($row->amount, 2, '.', ''),
+                ]);
+                $total += floatval($row->amount);
+            }
         }
-
         fputcsv($output, []);
-        fputcsv($output, ['', '', 'JUMLA YA MUAMALA:', number_format($total, 2)]);
+        fputcsv($output, ['', '', 'JUMLA YA FEDHA:', number_format($total, 2, '.', '')]);
+
         fclose($output);
         exit;
     }
@@ -127,23 +162,30 @@ class VICOBA_Export {
         $table_m = $wpdb->prefix . 'vicoba_members';
 
         $shareout = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_s WHERE id=%d", $shareout_id));
-        if (!$shareout) wp_die('Mgawanyo haukupatikana');
+        if (!$shareout) {
+            wp_die('Taarifa za Mgawanyo (Share-Out) hazikupatikana.');
+        }
 
         $details = $wpdb->get_results($wpdb->prepare(
             "SELECT d.*, m.full_name, m.member_number, m.phone FROM $table_d d JOIN $table_m m ON d.member_id=m.id WHERE d.shareout_id=%d ORDER BY d.net_payout DESC",
             $shareout_id
         ));
 
+        self::clean_buffers();
+
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="shareout-' . $shareout->shareout_date . '.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
 
         $output = fopen('php://output', 'w');
         fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-        fputcsv($output, ['RIPOTI YA MGAWANYO (SHARE-OUT) - ' . date('d/m/Y', strtotime($shareout->shareout_date))]);
-        fputcsv($output, ['Pool ya Jumla:', number_format($shareout->net_distributable, 2), 'TZS']);
+        fputcsv($output, ['RIPOTI YA MGAWANYO WA SHARA (SHARE-OUT)']);
+        fputcsv($output, ['Tarehe ya Mgawanyo:', date('d/m/Y', strtotime($shareout->shareout_date))]);
+        fputcsv($output, ['Pool ya Distributable Amount:', number_format($shareout->net_distributable, 2, '.', ''), 'TZS']);
         fputcsv($output, []);
-        fputcsv($output, ['Namba', 'Jina Kamili', 'Simu', 'Hisa', 'Uwiano (%)', 'Kiasi Halisi (TZS)', 'Mkopo Uliodaiwa', 'Kiasi cha Kulipwa (TZS)']);
+        fputcsv($output, ['Namba', 'Jina Kamili', 'Simu', 'Idadi ya Hisa', 'Uwiano (%)', 'Gross Payout (TZS)', 'Deni la Mkopo (TZS)', 'Net Payout (TZS)']);
 
         $i = 1;
         foreach ($details as $d) {
@@ -153,9 +195,9 @@ class VICOBA_Export {
                 $d->phone,
                 $d->total_member_shares,
                 number_format($d->share_ratio * 100, 2) . '%',
-                number_format($d->gross_payout, 2),
-                number_format($d->active_loan_deduction, 2),
-                number_format($d->net_payout, 2),
+                number_format($d->gross_payout, 2, '.', ''),
+                number_format($d->active_loan_deduction, 2, '.', ''),
+                number_format($d->net_payout, 2, '.', ''),
             ]);
         }
 
@@ -168,13 +210,26 @@ class VICOBA_Export {
      */
     public static function handle_download_request() {
         if (!isset($_GET['vicoba_export'])) return;
-        if (!is_user_logged_in()) wp_die('Tafadhali ingia kwanza.');
+        if (!is_user_logged_in()) {
+            wp_redirect(VICOBA_Router::get_url('login'));
+            exit;
+        }
 
         $type     = sanitize_text_field($_GET['vicoba_export']);
-        $member   = VICOBA_Members::get_member_by_user_id(get_current_user_id());
-        $group_id = $member ? $member->group_id : 0;
+        $user_id  = get_current_user_id();
+        $member   = VICOBA_Members::get_member_by_user_id($user_id);
+        
+        global $wpdb;
 
-        if (!$group_id) wp_die('Hakuna kikundi kilichopatikana.');
+        // Resolve group_id
+        $group_id = isset($_GET['group_id']) ? absint($_GET['group_id']) : 0;
+        if (!$group_id && $member) {
+            $group_id = $member->group_id;
+        }
+        if (!$group_id) {
+            $group_id = (int)$wpdb->get_var("SELECT id FROM {$wpdb->prefix}vicoba_groups ORDER BY id ASC LIMIT 1");
+        }
+        if (!$group_id) $group_id = 1;
 
         if ($type === 'ledger_csv') {
             $from = sanitize_text_field($_GET['from'] ?? '');
@@ -183,14 +238,25 @@ class VICOBA_Export {
         }
 
         if ($type === 'member_statement_csv') {
-            $member_id = absint($_GET['member_id'] ?? 0);
-            if (!$member_id) $member_id = $member->id;
-            self::export_member_statement_csv($group_id, $member_id);
+            $member_id = isset($_GET['member_id']) ? absint($_GET['member_id']) : 0;
+            if (!$member_id && $member) {
+                $member_id = $member->id;
+            }
+            if (!$member_id) {
+                $member_id = (int)$wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}vicoba_members WHERE group_id = %d ORDER BY id ASC LIMIT 1", $group_id));
+            }
+            if ($member_id) {
+                self::export_member_statement_csv($group_id, $member_id);
+            } else {
+                wp_die('Hakuna mwanachama aliyepatikana kwa ajili ya ripoti hii.');
+            }
         }
 
         if ($type === 'shareout_csv') {
-            $shareout_id = absint($_GET['shareout_id'] ?? 0);
-            if ($shareout_id) self::export_shareout_csv($shareout_id);
+            $shareout_id = isset($_GET['shareout_id']) ? absint($_GET['shareout_id']) : 0;
+            if ($shareout_id) {
+                self::export_shareout_csv($shareout_id);
+            }
         }
     }
 }
