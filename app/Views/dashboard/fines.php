@@ -3,9 +3,11 @@
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
   <div><h1 class="text-2xl font-extrabold text-slate-800">Usimamizi wa Faini</h1><p class="text-sm text-slate-500 mt-0.5">Toa faini na urekodi malipo ya faini za nidhamu au mikutano</p></div>
   <?php if(in_array($user->role,['super_admin','group_admin','secretary','treasurer'])): ?>
-  <button @click="showModal('issue-fine-modal')" class="btn-primary">
-    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-    Toa Faini Mpya
+  <button @click="showModal('issue-fine-modal')" class="btn btn-primary">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    <span>Toa Faini Mpya</span>
   </button>
   <?php endif; ?>
 </div>

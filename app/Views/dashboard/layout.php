@@ -19,12 +19,13 @@
   .scrollbar-thin::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:9999px; }
   @media print { .no-print { display:none!important; } body { background:white; } }
 
-  /* Pure CSS UI Components — Works 100% without Tailwind compilation */
+  /* Premium Global Components */
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    background-color: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     z-index: 50;
     display: flex;
     align-items: center;
@@ -33,12 +34,13 @@
   }
   .modal-box {
     background-color: #ffffff;
-    border-radius: 1rem;
+    border-radius: 1.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     width: 100%;
     max-width: 32rem;
     max-height: 90vh;
     overflow-y: auto;
+    border: 1px solid #f1f5f9;
   }
   .form-label {
     display: block;
@@ -46,22 +48,23 @@
     line-height: 1.25rem;
     font-weight: 600;
     color: #334155;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.375rem;
   }
   .form-input {
     width: 100%;
-    padding: 0.625rem 0.875rem;
+    padding: 0.625rem 1rem;
     border-radius: 0.75rem;
     border: 1px solid #cbd5e1;
     outline: none;
     font-size: 0.875rem;
     background-color: #ffffff;
     color: #1e293b;
-    transition: all 0.15s ease-in-out;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
   }
   .form-input:focus {
     border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
   }
   .btn {
     display: inline-flex;
@@ -73,37 +76,56 @@
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease-in-out;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
   }
-  .btn-primary {
-    background-color: #2563eb;
-    color: #ffffff;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  .btn:active {
+    transform: scale(0.98);
   }
-  .btn-primary:hover { background-color: #1d4ed8; }
+  .btn-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+  }
   .btn-secondary {
-    background-color: #f1f5f9;
+    background-color: #f8fafc;
     color: #334155;
     border: 1px solid #e2e8f0;
   }
-  .btn-secondary:hover { background-color: #e2e8f0; }
+  .btn-secondary:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+  }
   .btn-danger {
-    background-color: #dc2626;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     color: #ffffff;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
   }
-  .btn-danger:hover { background-color: #b91c1c; }
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+  }
   .btn-success {
-    background-color: #16a34a;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
     color: #ffffff;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
   }
-  .btn-success:hover { background-color: #15803d; }
+  .btn-success:hover {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+  }
   .stat-card {
     background-color: #ffffff;
     border-radius: 1rem;
     padding: 1.25rem;
     border: 1px solid #f1f5f9;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
   }
   .badge {
     display: inline-flex;
@@ -120,13 +142,13 @@
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
     text-align: left;
     background-color: #f8fafc;
     border-bottom: 1px solid #e2e8f0;
   }
   .table-auto td {
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
     font-size: 0.875rem;
     border-bottom: 1px solid #f1f5f9;
   }
@@ -142,13 +164,13 @@
 
   <!-- Logo -->
   <div class="flex items-center gap-3 px-6 py-5 border-b border-white/10">
-    <div class="w-9 h-9 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
-      <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30">
+      <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
       </svg>
     </div>
     <div class="min-w-0">
-      <p class="text-white font-bold text-sm leading-tight truncate">VICOBA Manager</p>
+      <p class="text-white font-extrabold text-base tracking-tight truncate">VICOBA Manager</p>
       <p class="text-blue-300 text-xs truncate"><?= e($group->name ?? 'Mfumo wa Kikundi') ?></p>
     </div>
   </div>
@@ -176,8 +198,8 @@
       $isActive = $current_view === $l['view'];
     ?>
     <a href="/dashboard/<?= $l['view'] ?>"
-       class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 <?= $isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 font-semibold' : 'text-slate-300 hover:bg-white/10 hover:text-white' ?>">
-      <span class="text-base flex-shrink-0"><?= $l['icon'] ?></span>
+       class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 <?= $isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 font-bold' : 'text-slate-300 hover:bg-white/10 hover:text-white' ?>">
+      <span class="text-lg flex-shrink-0"><?= $l['icon'] ?></span>
       <span class="truncate"><?= $l['label'] ?></span>
     </a>
     <?php endforeach; ?>
@@ -186,7 +208,7 @@
   <!-- User Info -->
   <div class="border-t border-white/10 px-4 py-4">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+      <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md">
         <?= strtoupper(substr($user->display_name ?? 'U', 0, 1)) ?>
       </div>
       <div class="flex-1 min-w-0">
@@ -205,24 +227,24 @@
 <div class="md:ml-64 min-h-screen flex flex-col">
 
   <!-- Top Bar -->
-  <header class="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 no-print">
+  <header class="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 no-print shadow-sm">
     <div class="flex items-center justify-between gap-4">
       <!-- Mobile menu button -->
-      <button @click="sidebarOpen=!sidebarOpen" class="md:hidden p-2 rounded-lg hover:bg-slate-100">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <button @click="sidebarOpen=!sidebarOpen" class="md:hidden p-2 rounded-xl hover:bg-slate-100 transition">
+        <svg class="w-6 h-6 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
 
       <!-- Breadcrumb -->
       <div class="hidden sm:flex items-center gap-2 text-sm text-slate-500">
         <span>Dashboard</span>
         <span>›</span>
-        <span class="font-semibold text-slate-800"><?= ucfirst(str_replace('-', ' ', $current_view)) ?></span>
+        <span class="font-bold text-slate-800"><?= ucfirst(str_replace('-', ' ', $current_view)) ?></span>
       </div>
 
       <!-- Right side -->
       <div class="flex items-center gap-3 ml-auto">
         <?php if ($overdue_count > 0 && in_array($role, ['super_admin','group_admin','treasurer'])): ?>
-        <a href="/dashboard/loans" class="hidden sm:flex items-center gap-1.5 text-xs bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg font-semibold">
+        <a href="/dashboard/loans" class="hidden sm:flex items-center gap-1.5 text-xs bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-xl font-semibold hover:bg-red-100 transition">
           ⚠️ <?= $overdue_count ?> mkopo umechelewesha
         </a>
         <?php endif; ?>
@@ -232,15 +254,15 @@
           <button @click="open=!open;loadNotifications()" class="relative p-2 rounded-xl hover:bg-slate-100 transition" title="Arifa">
             <svg class="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
             <?php if ($unread_count > 0): ?>
-            <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold"><?= min($unread_count, 9) ?></span>
+            <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold shadow-sm"><?= min($unread_count, 9) ?></span>
             <?php endif; ?>
           </button>
           <!-- Dropdown -->
           <div x-show="open" @click.outside="open=false" x-transition
-               class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden" x-cloak>
-            <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+               class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden" x-cloak>
+            <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <span class="font-bold text-sm text-slate-800">Arifa</span>
-              <button @click="markAllRead()" class="text-xs text-blue-600 hover:underline">Soma Zote</button>
+              <button @click="markAllRead()" class="text-xs text-blue-600 hover:underline font-medium">Soma Zote</button>
             </div>
             <div class="max-h-72 overflow-y-auto scrollbar-thin" id="notifications-list">
               <template x-if="notifications.length === 0">
@@ -261,7 +283,7 @@
 
         <!-- Group Badge -->
         <?php if ($group): ?>
-        <span class="hidden sm:flex items-center gap-1.5 text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1.5 rounded-lg">
+        <span class="hidden sm:flex items-center gap-1.5 text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1.5 rounded-xl shadow-xs">
           🏛️ <?= e($group->name) ?>
         </span>
         <?php endif; ?>
@@ -271,7 +293,7 @@
 
   <!-- Flash Messages -->
   <?php foreach ($flash as $f): ?>
-  <div class="mx-4 sm:mx-6 mt-4 px-4 py-3 rounded-xl text-sm font-medium no-print
+  <div class="mx-4 sm:mx-6 mt-4 px-4 py-3 rounded-xl text-sm font-medium no-print shadow-sm
     <?= $f['type'] === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' ?>">
     <?= e($f['message']) ?>
   </div>
