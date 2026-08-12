@@ -125,9 +125,10 @@ Router::post('/api/loans/send-otp',     [ApiController::class, 'sendDisbursement
 Router::post('/api/loans/verify-otp',   [ApiController::class, 'verifyDisbursementOtp']);
 
 // --- REST API: Super Admin ---
-Router::get ('/api/superadmin/groups',       [ApiController::class, 'superAdminGetGroups']);
-Router::post('/api/superadmin/group-status', [ApiController::class, 'superAdminGroupStatus']);
-Router::post('/api/superadmin/create-group', [ApiController::class, 'superAdminCreateGroup']);
+Router::get ('/api/superadmin/groups',         [ApiController::class, 'superAdminGetGroups']);
+Router::post('/api/superadmin/group-status',   [ApiController::class, 'superAdminGroupStatus']);
+Router::post('/api/superadmin/create-group',   [ApiController::class, 'superAdminCreateGroup']);
+Router::post('/api/superadmin/reset-password', [ApiController::class, 'superAdminResetPassword']);
 
 // ── Dispatch ───────────────────────────────────────────────────────────────────
 Router::dispatch();
