@@ -1,44 +1,62 @@
 <?php $group_id = (int)($group->id ?? 0); ?>
-<div x-data="finesPage()" x-init="load()">
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-extrabold text-slate-800">Usimamizi wa Faini</h1><p class="text-sm text-slate-500 mt-0.5">Toa faini na urekodi malipo ya faini za nidhamu au mikutano</p></div>
+<div x-data="finesPage()" x-init="load()" style="display:flex;flex-direction:column;gap:1.5rem">
+
+<!-- Header -->
+<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+  <div>
+    <h1 style="font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:.25rem">⚠️ Usimamizi wa Faini</h1>
+    <p style="font-size:.83rem;color:rgba(255,255,255,.45)">Toa faini na urekodi malipo ya faini za nidhamu au mikutano</p>
+  </div>
   <?php if(in_array($user->role,['super_admin','group_admin','secretary','treasurer'])): ?>
   <button @click="showModal('issue-fine-modal')" class="btn btn-primary">
-    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-    </svg>
-    <span>Toa Faini Mpya</span>
+    <span>➕ Toa Faini Mpya</span>
   </button>
   <?php endif; ?>
 </div>
 
-<div class="grid grid-cols-2 gap-4 mb-6">
-  <div class="stat-card"><p class="text-xs font-semibold text-slate-400 uppercase">Jumla ya Faini Hazijalipwa</p><p class="text-3xl font-extrabold text-red-600 mt-1" x-text="money(pendingTotal)"></p></div>
-  <div class="stat-card"><p class="text-xs font-semibold text-slate-400 uppercase">Faini Zilizolipwa</p><p class="text-3xl font-extrabold text-emerald-600 mt-1" x-text="money(paidTotal)"></p></div>
+<!-- Stats row -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+  <div class="stat-card">
+    <div class="stat-label">Jumla ya Faini Hazijalipwa</div>
+    <div class="stat-value" style="color:#f87171" x-text="money(pendingTotal)">TZS 0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Faini Zilizolipwa</div>
+    <div class="stat-value" style="color:#4ade80" x-text="money(paidTotal)">TZS 0</div>
+  </div>
 </div>
 
-<div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-  <div class="overflow-x-auto">
-    <table class="w-full text-left border-collapse">
-      <thead class="bg-slate-50 border-b">
-        <tr class="text-xs font-semibold text-slate-500 uppercase">
-          <th class="py-3.5 px-4">Mwanachama</th><th class="py-3.5 px-4">Sababu / Aina</th><th class="py-3.5 px-4 text-right">Kiasi</th><th class="py-3.5 px-4 text-center">Hali</th><th class="py-3.5 px-4">Tarehe</th><th class="py-3.5 px-4 text-right">Vitendo</th>
+<!-- Table Card -->
+<div class="card" style="overflow:hidden">
+  <div style="overflow-x:auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Mwanachama</th>
+          <th>Sababu / Aina</th>
+          <th style="text-align:right">Kiasi</th>
+          <th style="text-align:center">Hali</th>
+          <th>Tarehe</th>
+          <th style="text-align:right">Vitendo</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-slate-100 text-sm">
-        <template x-if="fines.length === 0"><tr><td colspan="6" class="text-center py-12 text-slate-400">Hakuna faini zilizorekodiwa</td></tr></template>
+      <tbody>
+        <template x-if="loading"><tr><td colspan="6" style="text-align:center;padding:2.5rem;color:rgba(255,255,255,.3)">Inapakia...</td></tr></template>
+        <template x-if="!loading && fines.length === 0">
+          <tr><td colspan="6" style="text-align:center;padding:2.5rem;color:rgba(255,255,255,.3)">Hakuna faini zilizorekodiwa</td></tr>
+        </template>
         <template x-for="f in fines" :key="f.id">
-          <tr class="hover:bg-slate-50">
-            <td class="py-3.5 px-4 font-semibold text-slate-800" x-text="f.member_name"></td>
-            <td class="py-3.5 px-4 text-slate-600" x-text="f.reason || f.fine_type_name"></td>
-            <td class="py-3.5 px-4 text-right font-bold text-red-600" x-text="money(f.amount)"></td>
-            <td class="py-3.5 px-4 text-center">
-              <span class="px-2.5 py-1 rounded-full text-xs font-semibold border" :class="f.status==='paid'?'bg-emerald-50 text-emerald-700 border-emerald-200':'bg-red-50 text-red-700 border-red-200'" x-text="f.status==='paid'?'Imelipwa':'Inasubiri'"></span>
+          <tr>
+            <td style="font-weight:700;color:#fff;font-size:.85rem" x-text="f.member_name"></td>
+            <td style="color:rgba(255,255,255,.7)" x-text="f.reason || f.fine_type_name"></td>
+            <td style="text-align:right;font-weight:800;color:#f87171" x-text="money(f.amount)"></td>
+            <td style="text-align:center">
+              <span class="badge" :class="f.status==='paid'?'badge-success':'badge-danger'" x-text="f.status==='paid'?'Imelipwa':'Inasubiri'"></span>
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-500" x-text="f.created_at"></td>
-            <td class="py-3.5 px-4 text-right">
+            <td style="color:rgba(255,255,255,.4);font-size:.75rem" x-text="f.created_at"></td>
+            <td style="text-align:right">
               <template x-if="f.status==='pending' && canManage">
-                <button @click="payFine(f)" class="btn-success text-xs py-1 px-2.5">💵 Lipa Faini</button>
+                <button @click="payFine(f)" class="btn btn-success btn-sm">💵 Lipa Faini</button>
               </template>
             </td>
           </tr>
@@ -48,78 +66,101 @@
   </div>
 </div>
 
-<div id="issue-fine-modal" class="modal-overlay hidden">
+<!-- ISSUE FINE MODAL -->
+<div id="issue-fine-modal" class="modal-overlay" style="display:none">
   <div class="modal-box">
-    <div class="flex items-center justify-between px-6 py-4 border-b"><h3 class="font-bold text-slate-800">Toa Faini Mpya</h3><button @click="hideModal('issue-fine-modal')" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button></div>
-    <form @submit.prevent="submitIssueFine" class="px-6 py-4 space-y-4">
+    <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between">
+      <div class="modal-title">Toa Faini Mpya</div>
+      <button @click="hideModal('issue-fine-modal')" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:1.5rem;cursor:pointer">&times;</button>
+    </div>
+    <form @submit.prevent="issueFine" class="modal-body" style="display:flex;flex-direction:column;gap:1rem">
       <div>
         <label class="form-label">Mwanachama *</label>
         <select x-model="form.member_id" required class="form-input">
           <option value="">-- Chagua Mwanachama --</option>
-          <template x-for="m in members" :key="m.id"><option :value="m.id" x-text="m.full_name"></option></template>
+          <template x-for="m in members" :key="m.id">
+            <option :value="m.id" x-text="m.full_name + ' (' + m.member_number + ')'"></option>
+          </template>
         </select>
       </div>
+
       <div>
-        <label class="form-label">Aina / Sababu ya Faini *</label>
-        <select x-model="selectedPreset" @change="onPresetChange()" required class="form-input">
-          <option value="">-- Chagua Aina ya Faini --</option>
-          <option value="Kuchelewa Kufika Mkutano|1000">⏱️ Kuchelewa Kufika Mkutano (TZS 1,000)</option>
-          <option value="Kutohudhuria Mkutano Bila Taarifa|5000">❌ Kutohudhuria Mkutano Bila Taarifa (TZS 5,000)</option>
-          <option value="Kuchelewesha Marejesho ya Mkopo|10000">🏦 Kuchelewesha Marejesho ya Mkopo (TZS 10,000)</option>
-          <option value="Kutovaa Sare au Kadi ya Kikundi|2000">👔 Kutovaa Sare / Kadi ya Kikundi (TZS 2,000)</option>
-          <option value="Kuvuruga Utaratibu wa Mkutano|5000">🔇 Kuvuruga Utaratibu / Nidhamu ya Mkutano (TZS 5,000)</option>
-          <option value="Kukosa Mchango wa Hisa au Jamii|3000">💰 Kukosa Mchango wa Hisa / Mfuko wa Jamii (TZS 3,000)</option>
-          <option value="custom">✏️ Sababu Nyingine (Weka Yako)</option>
+        <label class="form-label">Aina ya Faini</label>
+        <select x-model="form.fine_type_id" @change="onTypeChange" class="form-input">
+          <option value="">-- Faini ya Kawaida / Nyingine --</option>
+          <template x-for="ft in fineTypes" :key="ft.id">
+            <option :value="ft.id" x-text="ft.name + ' (TZS ' + Number(ft.amount).toLocaleString() + ')'"></option>
+          </template>
         </select>
       </div>
-      <div x-show="selectedPreset==='custom'" x-cloak>
-        <label class="form-label">Sababu Nyingine *</label>
-        <input x-model="form.custom_reason" type="text" class="form-input" placeholder="Andika sababu hapa...">
-      </div>
+
       <div>
         <label class="form-label">Kiasi cha Faini (TZS) *</label>
-        <input x-model.number="form.amount" type="number" min="500" required class="form-input" placeholder="1000">
+        <input x-model.number="form.amount" type="number" min="100" required class="form-input">
       </div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" @click="hideModal('issue-fine-modal')" class="btn-secondary">Ghairi</button>
-        <button type="submit" class="btn-primary" :disabled="saving">💾 Toa Faini</button>
+
+      <div>
+        <label class="form-label">Sababu ya Faini *</label>
+        <input x-model="form.reason" type="text" required class="form-input" placeholder="Mfano: Kuchelewa mkutano">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" @click="hideModal('issue-fine-modal')" class="btn btn-secondary">Ghairi</button>
+        <button type="submit" class="btn btn-primary" :disabled="saving">
+          <template x-if="saving"><span>⏳ Inahifadhi...</span></template>
+          <template x-if="!saving"><span>💾 Hifadhi Faini</span></template>
+        </button>
       </div>
     </form>
   </div>
 </div>
 
 </div>
+
 <script>
 function finesPage() {
   return {
-    fines:[], members:[], form:{}, selectedPreset:'', saving:false,
-    get canManage() { return ['super_admin','group_admin','treasurer','secretary'].includes(APP.role); },
-    get pendingTotal() { return this.fines.filter(f=>f.status==='pending').reduce((a,b)=>a+Number(b.amount),0); },
-    get paidTotal() { return this.fines.filter(f=>f.status==='paid').reduce((a,b)=>a+Number(b.amount),0); },
-    onPresetChange() {
-      if (this.selectedPreset && this.selectedPreset !== 'custom') {
-        const [reason, amount] = this.selectedPreset.split('|');
-        this.form.reason = reason;
-        this.form.amount = Number(amount);
-      }
-    },
+    fines: [], members: [], fineTypes: [], form: {}, saving: false, loading: true,
+    get canManage() { return ['super_admin','group_admin','secretary','treasurer'].includes(APP.role); },
+    get pendingTotal() { return this.fines.filter(f=>f.status==='pending').reduce((a,b)=>a+Number(b.amount||0),0); },
+    get paidTotal() { return this.fines.filter(f=>f.status==='paid').reduce((a,b)=>a+Number(b.amount||0),0); },
     async load() {
-      const d = await api('/api/fines'); if(d) this.fines = d.fines;
-      const m = await api('/api/members'); if(m) this.members = m.members;
+      this.loading = true;
+      try {
+        const d = await fetch('/api/fines').then(r=>r.json());
+        if (d) { this.fines = d.fines || []; this.fineTypes = d.types || []; }
+        const m = await fetch('/api/members').then(r=>r.json());
+        if (m && m.members) this.members = m.members;
+      } catch(e) {}
+      this.loading = false;
     },
-    async submitIssueFine() {
-      if (this.selectedPreset === 'custom') {
-        this.form.reason = this.form.custom_reason || 'Faini';
-      }
-      this.saving = true; const d = await api('/api/fines/issue','POST', this.form); this.saving = false;
-      if(d) { hideModal('issue-fine-modal'); this.form={}; this.selectedPreset=''; this.load(); Swal.fire({icon:'success',title:'Faini imetolewa!',confirmButtonColor:'#2563eb'}); }
+    onTypeChange() {
+      const ft = this.fineTypes.find(t => t.id == this.form.fine_type_id);
+      if (ft) { this.form.amount = ft.amount; this.form.reason = ft.name; }
+    },
+    async issueFine() {
+      this.saving = true;
+      try {
+        const res = await fetch('/api/fines/issue', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(this.form) });
+        const d = await res.json();
+        this.saving = false;
+        if (d && d.success) {
+          document.getElementById('issue-fine-modal').style.display = 'none';
+          this.form = {}; this.load();
+          Swal.fire({ icon:'success', title:'Faini Imetolewa!', text:'Faini imewasilishwa.', confirmButtonColor:'#2563eb', timer:2000 });
+        }
+      } catch(e) { this.saving = false; }
     },
     async payFine(f) {
-      if(await confirm_action('Thibitisha Malipo', `Lipa faini ya ${money(f.amount)} kwa ${f.member_name}?`, 'Ndio, Lipa', '#16a34a')) {
-        const d = await api('/api/fines/pay','POST',{fine_id: f.id, payment_method:'cash'});
-        if(d) { this.load(); Swal.fire({icon:'success',title:'Imelipwa!',confirmButtonColor:'#16a34a'}); }
+      if (confirm('Thibitisha malipo ya faini ya TZS ' + Number(f.amount).toLocaleString() + ' kwa ' + f.member_name + '?')) {
+        const res = await fetch('/api/fines/pay', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fine_id: f.id}) });
+        const d = await res.json();
+        if (d && d.success) { this.load(); Swal.fire({ icon:'success', title:'Imelipwa!', text:'Faini imelipwa.', confirmButtonColor:'#16a34a' }); }
       }
-    }
+    },
+    showModal(id) { document.getElementById(id).style.display = 'flex'; },
+    hideModal(id) { document.getElementById(id).style.display = 'none'; },
+    money(v) { return 'TZS ' + Number(v||0).toLocaleString(); }
   }
 }
 </script>
