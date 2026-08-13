@@ -10,40 +10,74 @@ if (!$group_id) {
     return;
 }
 
-$stats        = Models\Reports::getSummary($group_id);
-$recent_txns  = Database::all(
-    "SELECT t.*, m.full_name as member_name FROM " . Database::t('transactions') . " t
-     LEFT JOIN " . Database::t('members') . " m ON m.id=t.member_id
-     WHERE t.group_id=? ORDER BY t.created_at DESC LIMIT 8",
-    [$group_id]
-);
-$recent_loans = Database::all(
-    "SELECT l.*, m.full_name as member_name FROM " . Database::t('loans') . " l
-     JOIN " . Database::t('members') . " m ON m.id=l.member_id
-     WHERE l.group_id=? ORDER BY l.created_at DESC LIMIT 6",
-    [$group_id]
-);
-$share_monthly = Database::all(
-    "SELECT DATE_FORMAT(payment_date,'%b %Y') as label, SUM(total_amount) as amount
-     FROM " . Database::t('shares') . " WHERE group_id=?
-     GROUP BY DATE_FORMAT(payment_date,'%Y-%m') ORDER BY MIN(payment_date) DESC LIMIT 7",
-    [$group_id]
-);
-$share_monthly = array_reverse($share_monthly);
+try {
+    $stats = Models\Reports::getSummary($group_id);
+} catch (\Throwable $e) {
+    error_log('Error fetching stats summary: ' . $e->getMessage());
+    $stats = [
+        'total_shares' => 0, 'active_loans' => 0, 'fines_pending' => 0, 'fines_paid' => 0,
+        'member_count' => 0, 'overdue_loans' => 0, 'balance' => ['income' => 0, 'expenses' => 0],
+        'health_score' => 100, 'risk_level' => 'LOW', 'npl_rate' => 0, 'repayment_rate' => 100,
+        'social_fund_balance' => 0
+    ];
+}
 
-$loan_monthly = Database::all(
-    "SELECT DATE_FORMAT(disbursement_date,'%b %Y') as label, COUNT(*) as count, SUM(principal_amount) as amount
-     FROM " . Database::t('loans') . " WHERE group_id=?
-     GROUP BY DATE_FORMAT(disbursement_date,'%Y-%m') ORDER BY MIN(disbursement_date) DESC LIMIT 7",
-    [$group_id]
-);
-$loan_monthly = array_reverse($loan_monthly);
+try {
+    $recent_txns = Database::all(
+        "SELECT t.*, m.full_name as member_name FROM " . Database::t('transactions') . " t
+         LEFT JOIN " . Database::t('members') . " m ON m.id=t.member_id
+         WHERE t.group_id=? ORDER BY t.created_at DESC LIMIT 8",
+        [$group_id]
+    );
+} catch (\Throwable $e) {
+    $recent_txns = [];
+}
 
-// Loan status breakdown
-$loan_status = Database::all(
-    "SELECT status, COUNT(*) as cnt FROM " . Database::t('loans') . " WHERE group_id=? GROUP BY status",
-    [$group_id]
-);
+try {
+    $recent_loans = Database::all(
+        "SELECT l.*, m.full_name as member_name FROM " . Database::t('loans') . " l
+         JOIN " . Database::t('members') . " m ON m.id=l.member_id
+         WHERE l.group_id=? ORDER BY l.created_at DESC LIMIT 6",
+        [$group_id]
+    );
+} catch (\Throwable $e) {
+    $recent_loans = [];
+}
+
+try {
+    $share_monthly = Database::all(
+        "SELECT DATE_FORMAT(payment_date,'%b %Y') as label, SUM(total_amount) as amount
+         FROM " . Database::t('shares') . " WHERE group_id=?
+         GROUP BY DATE_FORMAT(payment_date,'%Y-%m'), DATE_FORMAT(payment_date,'%b %Y')
+         ORDER BY MIN(payment_date) DESC LIMIT 7",
+        [$group_id]
+    );
+    $share_monthly = array_reverse($share_monthly);
+} catch (\Throwable $e) {
+    $share_monthly = [];
+}
+
+try {
+    $loan_monthly = Database::all(
+        "SELECT DATE_FORMAT(COALESCE(disbursed_at, created_at),'%b %Y') as label, COUNT(*) as count, SUM(principal_amount) as amount
+         FROM " . Database::t('loans') . " WHERE group_id=?
+         GROUP BY DATE_FORMAT(COALESCE(disbursed_at, created_at),'%Y-%m'), DATE_FORMAT(COALESCE(disbursed_at, created_at),'%b %Y')
+         ORDER BY MIN(COALESCE(disbursed_at, created_at)) DESC LIMIT 7",
+        [$group_id]
+    );
+    $loan_monthly = array_reverse($loan_monthly);
+} catch (\Throwable $e) {
+    $loan_monthly = [];
+}
+
+try {
+    $loan_status = Database::all(
+        "SELECT status, COUNT(*) as cnt FROM " . Database::t('loans') . " WHERE group_id=? GROUP BY status",
+        [$group_id]
+    );
+} catch (\Throwable $e) {
+    $loan_status = [];
+}
 ?>
 
 <div style="display:flex;flex-direction:column;gap:1.5rem">
