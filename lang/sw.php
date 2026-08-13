@@ -1,0 +1,22 @@
+<?php
+return [
+    'app_name'          => 'VICOBA Manager',
+    'dashboard'         => 'Dashibodi',
+    'overview'          => 'Muhtasari',
+    'members'           => 'Wanachama',
+    'shares'            => 'Hisa',
+    'loans'             => 'Mikopo',
+    'fines'             => 'Faini',
+    'meetings'          => 'Mikutano',
+    'social_fund'       => 'Mfuko wa Jamii',
+    'shareout'          => 'Gawio (Share-Out)',
+    'ledger'            => 'Daftari Kuu',
+    'accounting'        => 'Uhasibu & Ripoti za Kibenki',
+    'collateral'        => 'Dhamana & Nyaraka',
+    'reports'           => 'Ripoti & Exports',
+    'settings'          => 'Mipangilio',
+    'super_admin'       => 'Super Admin',
+    'logout'            => 'Orodoka (Logout)',
+    'financial_health'  => 'Afya ya Kifedha ya Kikundi',
+    'credit_score'      => 'Kipimo cha Mikopo (Credit Score)',
+];

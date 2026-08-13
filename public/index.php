@@ -130,5 +130,7 @@ Router::post('/api/superadmin/group-status',   [ApiController::class, 'superAdmi
 Router::post('/api/superadmin/create-group',   [ApiController::class, 'superAdminCreateGroup']);
 Router::post('/api/superadmin/reset-password', [ApiController::class, 'superAdminResetPassword']);
 
-// ── Dispatch ───────────────────────────────────────────────────────────────────
+// --- REST API: Accounting & Credit Scoring ---
+Router::get ('/api/accounting/statements', [ApiController::class, 'getAccountingStatements']);
+Router::get ('/api/credit-score',           [ApiController::class, 'getCreditScore']);
 Router::dispatch();

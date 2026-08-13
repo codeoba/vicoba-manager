@@ -569,10 +569,28 @@ class ApiController
         $expires = $_SESSION['disburse_otp_expires'] ?? 0;
 
         if (empty($input_otp) || $input_otp !== $stored_otp || time() > $expires) {
-            $this.json(['success' => false, 'message' => 'OTP si sahihi au imepitwa na wakati.'], 422);
+            $this->json(['success' => false, 'message' => 'OTP si sahihi au imepitwa na wakati.'], 422);
         }
 
         unset($_SESSION['disburse_otp'], $_SESSION['disburse_otp_expires']);
-        $this.json(['success' => true, 'message' => 'OTP imethibitishwa kikamilifu!']);
+        $this->json(['success' => true, 'message' => 'OTP imethibitishwa kikamilifu!']);
+    }
+
+    public function getAccountingStatements(array $p = []): never
+    {
+        $user = $this->requireAuth();
+        $group_id = $this->groupId($user);
+        $statements = \Models\Accounting::getFinancialStatements($group_id);
+        $this->json(['success' => true, 'statements' => $statements]);
+    }
+
+    public function getCreditScore(array $p = []): never
+    {
+        $user = $this->requireAuth();
+        $member_id = (int)($_GET['member_id'] ?? 0);
+        $group_id = $this->groupId($user);
+
+        $score = \Services\CreditScoreService::calculate($member_id, $group_id);
+        $this->json(['success' => true, 'score' => $score]);
     }
 }

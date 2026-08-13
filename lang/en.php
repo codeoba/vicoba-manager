@@ -1,0 +1,22 @@
+<?php
+return [
+    'app_name'          => 'VICOBA Manager',
+    'dashboard'         => 'Dashboard',
+    'overview'          => 'Overview',
+    'members'           => 'Members',
+    'shares'            => 'Shares',
+    'loans'             => 'Loans',
+    'fines'             => 'Fines',
+    'meetings'          => 'Meetings',
+    'social_fund'       => 'Social Fund',
+    'shareout'          => 'Share-Out & Dividends',
+    'ledger'            => 'General Ledger',
+    'accounting'        => 'Banking & Financial Accounting',
+    'collateral'        => 'Collateral & Documents',
+    'reports'           => 'Reports & Exports',
+    'settings'          => 'Settings',
+    'super_admin'       => 'Super Admin',
+    'logout'            => 'Logout',
+    'financial_health'  => 'Group Financial Health Index',
+    'credit_score'      => 'Credit Rating Score',
+];

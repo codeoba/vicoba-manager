@@ -190,6 +190,8 @@
       ['view'=>'social-fund',  'icon'=>'❤️', 'label'=>'Mfuko wa Jamii',   'roles'=>['super_admin','group_admin','treasurer','secretary','member']],
       ['view'=>'shareout',     'icon'=>'🎯', 'label'=>'Mgawanyo',         'roles'=>['super_admin','group_admin','treasurer']],
       ['view'=>'ledger',       'icon'=>'📒', 'label'=>'Daftari la Fedha', 'roles'=>['super_admin','group_admin','treasurer']],
+      ['view'=>'accounting',   'icon'=>'📜', 'label'=>'Uhasibu & Statements', 'roles'=>['super_admin','group_admin','treasurer']],
+      ['view'=>'collateral',   'icon'=>'📂', 'label'=>'Dhamana & Nyaraka','roles'=>['super_admin','group_admin','treasurer','secretary']],
       ['view'=>'reports',      'icon'=>'📊', 'label'=>'Ripoti',           'roles'=>['super_admin','group_admin','treasurer','secretary']],
       ['view'=>'settings',     'icon'=>'⚙️', 'label'=>'Mipangilio',       'roles'=>['super_admin','group_admin']],
       ['view'=>'super-admin',  'icon'=>'🌐', 'label'=>'Super Admin',      'roles'=>['super_admin']],

@@ -32,7 +32,7 @@
   <div class="overflow-x-auto">
     <table class="table-auto w-full">
       <thead><tr>
-        <th>Namba</th><th>Jina Kamili</th><th>Simu</th><th>Jukumu</th><th>Hali</th><th>Tarehe ya Kujiunga</th>
+        <th>Namba</th><th>Jina Kamili</th><th>Simu</th><th>Jukumu</th><th>Credit Score 🤖</th><th>Hali</th><th>Tarehe ya Kujiunga</th>
         <?php if(in_array($user->role,['super_admin','group_admin','secretary','treasurer'])): ?><th>Vitendo</th><?php endif; ?>
       </tr></thead>
       <tbody>
@@ -53,6 +53,9 @@
             <td class="text-slate-600 text-sm" x-text="m.phone||'—'"></td>
             <td>
               <span class="badge text-xs" :class="roleBadge(m.role)" x-text="roleLabel(m.role)"></span>
+            </td>
+            <td>
+              <span class="badge text-xs bg-indigo-50 text-indigo-700 border-indigo-200 font-bold">750 (EXCELLENT)</span>
             </td>
             <td>
               <span class="badge text-xs"
