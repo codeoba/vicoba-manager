@@ -138,8 +138,24 @@
     <form @submit.prevent="createGroup" class="px-6 py-4 space-y-4">
       <div><label class="form-label">Jina la Kikundi *</label><input x-model="form.name" type="text" required class="form-input" placeholder="Mfano: VICOBA Amani Mwanza"></div>
       <div class="grid grid-cols-2 gap-4">
-        <div><label class="form-label">Mkoa</label><input x-model="form.region" type="text" class="form-input" placeholder="Mwanza"></div>
-        <div><label class="form-label">Wilaya</label><input x-model="form.district" type="text" class="form-input" placeholder="Nyamagana"></div>
+        <div>
+          <label class="form-label">Mkoa *</label>
+          <select x-model="form.region" @change="onRegionChange()" required class="form-input">
+            <option value="">-- Chagua Mkoa --</option>
+            <template x-for="(districts, reg) in regionsData" :key="reg">
+              <option :value="reg" x-text="reg"></option>
+            </template>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Wilaya *</label>
+          <select x-model="form.district" required class="form-input" :disabled="!form.region">
+            <option value="">-- Chagua Wilaya --</option>
+            <template x-for="d in availableDistricts" :key="d">
+              <option :value="d" x-text="d"></option>
+            </template>
+          </select>
+        </div>
       </div>
       <div><label class="form-label">Bei kwa Hisa Moja (TZS)</label><input x-model.number="form.share_price" type="number" class="form-input" value="1000"></div>
       <div class="flex justify-end gap-3 pt-3 border-t">
@@ -159,6 +175,13 @@
 function superAdminPage() {
   return {
     tab:'groups', groups:[], users:[], logs:[], total_members:0, form:{share_price:1000}, saving:false,
+    regionsData: typeof TANZANIA_REGIONS !== 'undefined' ? TANZANIA_REGIONS : {},
+    get availableDistricts() {
+      return this.form.region ? (this.regionsData[this.form.region] || []) : [];
+    },
+    onRegionChange() {
+      this.form.district = '';
+    },
     async load() {
       const d = await api('/api/superadmin/groups');
       if (d) {

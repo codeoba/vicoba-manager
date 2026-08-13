@@ -39,7 +39,19 @@
       <button @click="hideModal('add-expense-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
     </div>
     <form @submit.prevent="submitExpense" class="px-6 py-4 space-y-4">
-      <div><label class="form-label">Maelezo ya Matumizi *</label><input x-model="expenseForm.description" type="text" required class="form-input" placeholder="Mfano: Nauli ya katibu, daftari..."></div>
+      <div>
+        <label class="form-label">Aina / Maelezo ya Matumizi *</label>
+        <select x-model="expenseForm.description" required class="form-input">
+          <option value="">-- Chagua Aina ya Matumizi --</option>
+          <option value="Vifaa vya Ofisi na Madaftari">📄 Vifaa vya Ofisi na Vitabu/Madaftari</option>
+          <option value="Nauli na Usafiri wa Viongozi">🚌 Nauli na Usafiri wa Viongozi</option>
+          <option value="Kodi ya Ukumbi / Pango">🏛️ Kodi ya Ukumbi / Pango la Mkutano</option>
+          <option value="Ada ya Usajili / Halmashauri">📑 Ada ya Usajili / Leseni ya Halmashauri</option>
+          <option value="Chakula na Vinywaji vya Mkutano">☕ Chakula na Vinywaji vya Mkutano</option>
+          <option value="Gharama za Simu na Intaneti">📱 Gharama za Simu na Intaneti</option>
+          <option value="Matumizi Mengineyo">✏️ Matumizi Mengineyo</option>
+        </select>
+      </div>
       <div><label class="form-label">Kiasi (TZS) *</label><input x-model.number="expenseForm.amount" type="number" min="500" required class="form-input" placeholder="5000"></div>
       <div><label class="form-label">Njia ya Malipo</label><select x-model="expenseForm.payment_method" class="form-input"><option value="cash">Pesa Taslimu</option><option value="mobile_money">Mobile Money</option><option value="bank">Bank</option></select></div>
       <div class="flex justify-end gap-3 pt-3 border-t">

@@ -60,8 +60,21 @@
         </select>
       </div>
       <div>
-        <label class="form-label">Sababu *</label>
-        <input x-model="form.reason" type="text" required class="form-input" placeholder="Mfano: Kuchelewa mkutano">
+        <label class="form-label">Aina / Sababu ya Faini *</label>
+        <select x-model="selectedPreset" @change="onPresetChange()" required class="form-input">
+          <option value="">-- Chagua Aina ya Faini --</option>
+          <option value="Kuchelewa Kufika Mkutano|1000">⏱️ Kuchelewa Kufika Mkutano (TZS 1,000)</option>
+          <option value="Kutohudhuria Mkutano Bila Taarifa|5000">❌ Kutohudhuria Mkutano Bila Taarifa (TZS 5,000)</option>
+          <option value="Kuchelewesha Marejesho ya Mkopo|10000">🏦 Kuchelewesha Marejesho ya Mkopo (TZS 10,000)</option>
+          <option value="Kutovaa Sare au Kadi ya Kikundi|2000">👔 Kutovaa Sare / Kadi ya Kikundi (TZS 2,000)</option>
+          <option value="Kuvuruga Utaratibu wa Mkutano|5000">🔇 Kuvuruga Utaratibu / Nidhamu ya Mkutano (TZS 5,000)</option>
+          <option value="Kukosa Mchango wa Hisa au Jamii|3000">💰 Kukosa Mchango wa Hisa / Mfuko wa Jamii (TZS 3,000)</option>
+          <option value="custom">✏️ Sababu Nyingine (Weka Yako)</option>
+        </select>
+      </div>
+      <div x-show="selectedPreset==='custom'" x-cloak>
+        <label class="form-label">Sababu Nyingine *</label>
+        <input x-model="form.custom_reason" type="text" class="form-input" placeholder="Andika sababu hapa...">
       </div>
       <div>
         <label class="form-label">Kiasi cha Faini (TZS) *</label>
@@ -79,17 +92,27 @@
 <script>
 function finesPage() {
   return {
-    fines:[], members:[], form:{}, saving:false,
+    fines:[], members:[], form:{}, selectedPreset:'', saving:false,
     get canManage() { return ['super_admin','group_admin','treasurer','secretary'].includes(APP.role); },
     get pendingTotal() { return this.fines.filter(f=>f.status==='pending').reduce((a,b)=>a+Number(b.amount),0); },
     get paidTotal() { return this.fines.filter(f=>f.status==='paid').reduce((a,b)=>a+Number(b.amount),0); },
+    onPresetChange() {
+      if (this.selectedPreset && this.selectedPreset !== 'custom') {
+        const [reason, amount] = this.selectedPreset.split('|');
+        this.form.reason = reason;
+        this.form.amount = Number(amount);
+      }
+    },
     async load() {
       const d = await api('/api/fines'); if(d) this.fines = d.fines;
       const m = await api('/api/members'); if(m) this.members = m.members;
     },
     async submitIssueFine() {
+      if (this.selectedPreset === 'custom') {
+        this.form.reason = this.form.custom_reason || 'Faini';
+      }
       this.saving = true; const d = await api('/api/fines/issue','POST', this.form); this.saving = false;
-      if(d) { hideModal('issue-fine-modal'); this.form={}; this.load(); Swal.fire({icon:'success',title:'Faini imetolewa!',confirmButtonColor:'#2563eb'}); }
+      if(d) { hideModal('issue-fine-modal'); this.form={}; this.selectedPreset=''; this.load(); Swal.fire({icon:'success',title:'Faini imetolewa!',confirmButtonColor:'#2563eb'}); }
     },
     async payFine(f) {
       if(await confirm_action('Thibitisha Malipo', `Lipa faini ya ${money(f.amount)} kwa ${f.member_name}?`, 'Ndio, Lipa', '#16a34a')) {

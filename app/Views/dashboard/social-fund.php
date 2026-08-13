@@ -50,7 +50,17 @@
         </select>
       </div>
       <div><label class="form-label">Kiasi (TZS) *</label><input x-model.number="contribForm.amount" type="number" min="500" required class="form-input" placeholder="1000"></div>
-      <div><label class="form-label">Sababu</label><input x-model="contribForm.reason" type="text" class="form-input" placeholder="Mchango wa mwezi"></div>
+      <div>
+        <label class="form-label">Sababu / Dhumuni la Mchango *</label>
+        <select x-model="contribForm.reason" required class="form-input">
+          <option value="">-- Chagua Sababu --</option>
+          <option value="Mchango wa Mwezi (Kawaida)">💰 Mchango wa Mwezi (Kawaida)</option>
+          <option value="Msiba wa Mwanachama / Ndugu">🕯️ Msiba wa Mwanachama / Ndugu wa Karibu</option>
+          <option value="Ugonjwa / Matibabu ya Dharura">🚑 Ugonjwa / Matibabu ya Dharura</option>
+          <option value="Janga la Moto / Mafuriko">🏠 Janga la Moto / Mafuriko</option>
+          <option value="Sherehe ya Harusi / Uzazi">🎉 Sherehe ya Harusi / Uzazi</option>
+        </select>
+      </div>
       <div class="flex justify-end gap-3 pt-3 border-t">
         <button type="button" @click="hideModal('contribute-modal')" class="btn btn-secondary">Ghairi</button>
         <button type="submit" class="btn btn-primary" :disabled="saving">💾 Hifadhi Mchango</button>

@@ -111,8 +111,18 @@
         </div>
       </div>
       <div>
-        <label class="form-label">Dhumuni la Mkopo</label>
-        <textarea x-model="form.purpose" rows="2" class="form-input" placeholder="Mfano: Biashara ya duka, kilimo..."></textarea>
+        <label class="form-label">Dhumuni la Mkopo *</label>
+        <select x-model="form.purpose" required class="form-input">
+          <option value="">-- Chagua Dhumuni la Mkopo --</option>
+          <option value="Biashara Ndogondogo / Duka">🛒 Biashara Ndogondogo / Duka</option>
+          <option value="Kilimo na Ufugaji">🌾 Kilimo na Ufugaji</option>
+          <option value="Ada na Mafunzo ya Shule">🎓 Ada na Mafunzo ya Shule</option>
+          <option value="Ujenzi na Ukarabati wa Nyumba">🏠 Ujenzi na Ukarabati wa Nyumba</option>
+          <option value="Matibabu na Afya ya Familia">🚑 Matibabu na Afya ya Familia</option>
+          <option value="Usafiri na Vyombo vya Usafirishaji">🚗 Usafiri na Vyombo vya Usafirishaji</option>
+          <option value="Mtaji wa Biashara">💼 Mtaji wa Biashara</option>
+          <option value="Matumizi Binafsi">👤 Matumizi Binafsi</option>
+        </select>
       </div>
 
       <div class="flex justify-end gap-3 pt-3 border-t">
