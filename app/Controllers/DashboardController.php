@@ -22,7 +22,7 @@ class DashboardController
         $allowed = [
             'overview','members','shares','loans','fines',
             'meetings','social-fund','shareout','reports',
-            'settings','super-admin','ledger',
+            'settings','super-admin','ledger','accounting','collateral',
         ];
 
         if (!in_array($view, $allowed)) {
