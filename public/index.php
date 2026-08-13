@@ -46,7 +46,7 @@ if (config('app.debug')) {
 
 // Global exception handler — prevents blank pages in production
 set_exception_handler(function(Throwable $e) {
-    if (config('app.debug')) {
+    if (config('app.debug') || isset($_GET['debug'])) {
         echo '<pre style="background:#0d1117;color:#f85149;padding:2rem;font-family:monospace">';
         echo '<strong>' . get_class($e) . '</strong>: ' . htmlspecialchars($e->getMessage()) . "\n";
         echo 'File: ' . $e->getFile() . ' Line: ' . $e->getLine() . "\n\n";

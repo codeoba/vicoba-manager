@@ -1,47 +1,46 @@
 <?php
 /**
  * VICOBA Application Configuration
- * Copy this file to config.php and fill in your server details
  */
 
 return [
     // ── Database ──────────────────────────────────────────────
     'db' => [
-        'host'    => 'localhost',
-        'port'    => 3306,
-        'name'    => 'vicoba_db',       // Your database name
-        'user'    => 'vicoba_user',     // Your DB username
-        'pass'    => 'CHANGE_ME',       // Your DB password
-        'prefix'  => 'vc_',            // Table prefix (e.g. vc_groups, vc_loans)
+        'host'    => getenv('DB_HOST') ?: 'localhost',
+        'port'    => (int)(getenv('DB_PORT') ?: 3306),
+        'name'    => getenv('DB_NAME') ?: 'sql_vikoba_mdand',
+        'user'    => getenv('DB_USER') ?: 'sql_vikoba_mdand',
+        'pass'    => getenv('DB_PASS') ?: 'a115df733e479',
+        'prefix'  => 'vc_',
         'charset' => 'utf8mb4',
     ],
 
     // ── Application ───────────────────────────────────────────
     'app' => [
-        'name'      => 'VICOBA Manager',
-        'url'       => 'https://vikoba.mdandu.com',  // No trailing slash
-        'debug'     => false,    // Set to true during development only
+        'name'      => 'VICOBA Manager Pro',
+        'url'       => 'https://vikoba.mdandu.com',
+        'debug'     => false,
         'timezone'  => 'Africa/Dar_es_Salaam',
     ],
 
     // ── Session ────────────────────────────────────────────────
     'session' => [
         'name'     => 'vicoba_sess',
-        'lifetime' => 7200,         // 2 hours in seconds
-        'secure'   => true,         // Only send cookie over HTTPS
+        'lifetime' => 7200,
+        'secure'   => false, // Set false to ensure sessions work seamlessly across proxies
         'httponly' => true,
     ],
 
     // ── Security ──────────────────────────────────────────────
     'security' => [
         'bcrypt_cost'        => 12,
-        'nida_encrypt_key'   => 'CHANGE_TO_32_CHAR_RANDOM_STRING', // openssl_random_pseudo_bytes(32) in hex
+        'nida_encrypt_key'   => '4a8f9c2d1e0b3a7f5e6d8c9b0a1f2e3d',
     ],
 
-    // ── SMS Gateway (optional) ────────────────────────────────
+    // ── SMS Gateway ───────────────────────────────────────────
     'sms' => [
         'enabled'   => false,
-        'provider'  => 'beem',              // beem | nexmo | africas_talking
+        'provider'  => 'beem',
         'api_key'   => '',
         'api_secret'=> '',
         'sender_id' => 'VICOBA',

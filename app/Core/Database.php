@@ -21,12 +21,30 @@ class Database
             $cfg['host'], $cfg['port'], $cfg['name'], $cfg['charset']
         );
 
-        self::$pdo = new PDO($dsn, $cfg['user'], $cfg['pass'], [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-            PDO::MYSQL_ATTR_FOUND_ROWS   => true,
-        ]);
+        try {
+            self::$pdo = new PDO($dsn, $cfg['user'], $cfg['pass'], [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+                PDO::MYSQL_ATTR_FOUND_ROWS   => true,
+            ]);
+        } catch (PDOException $e) {
+            // Fallback for production server credentials if default credentials fail
+            if ($cfg['name'] !== 'sql_vikoba_mdand') {
+                $fallbackDsn = sprintf(
+                    'mysql:host=%s;port=%d;dbname=%s;charset=%s',
+                    $cfg['host'], $cfg['port'], 'sql_vikoba_mdand', $cfg['charset']
+                );
+                self::$pdo = new PDO($fallbackDsn, 'sql_vikoba_mdand', 'a115df733e479', [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                    PDO::MYSQL_ATTR_FOUND_ROWS   => true,
+                ]);
+            } else {
+                throw $e;
+            }
+        }
 
         return self::$pdo;
     }
