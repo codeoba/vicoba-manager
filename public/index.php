@@ -44,6 +44,28 @@ if (config('app.debug')) {
     error_reporting(0);
 }
 
+// Global exception handler — prevents blank pages in production
+set_exception_handler(function(Throwable $e) {
+    if (config('app.debug')) {
+        echo '<pre style="background:#0d1117;color:#f85149;padding:2rem;font-family:monospace">';
+        echo '<strong>' . get_class($e) . '</strong>: ' . htmlspecialchars($e->getMessage()) . "\n";
+        echo 'File: ' . $e->getFile() . ' Line: ' . $e->getLine() . "\n\n";
+        echo htmlspecialchars($e->getTraceAsString());
+        echo '</pre>';
+    } else {
+        http_response_code(500);
+        echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Hitilafu ya Seva</title>';
+        echo '<style>body{font-family:sans-serif;background:#050c1a;color:#f1f5f9;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center}</style></head>';
+        echo '<body><div><div style="font-size:3rem;margin-bottom:1rem">⚠️</div>';
+        echo '<h1 style="color:#f87171">Hitilafu ya Seva (500)</h1>';
+        echo '<p style="color:rgba(255,255,255,.5);margin-top:.5rem">Tatizo limetokea. Tafadhali jaribu tena baadaye.</p>';
+        echo '<a href="/" style="display:inline-block;margin-top:1.5rem;padding:.75rem 2rem;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;border-radius:.75rem;text-decoration:none;font-weight:700">Rudi Nyumbani</a>';
+        echo '</div></body></html>';
+    }
+    error_log('[VICOBA 500] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+    exit;
+});
+
 // Start session
 Auth::start();
 
@@ -56,8 +78,17 @@ Router::get('/logout',   [AuthController::class, 'logout']);
 Router::get('/register', [AuthController::class, 'registerPage']);
 Router::post('/register',[AuthController::class, 'registerPost']);
 
+// --- Home (landing page for guests) ---
+Router::get('/', function(array $params = []) {
+    if (Auth::check()) {
+        Response::redirect('/dashboard/overview');
+    }
+    // Show landing page
+    $flash = get_flash();
+    include VIEW_PATH . '/home.php';
+});
+
 // --- Dashboard (SPA-style, sidebar loads sub-views) ---
-Router::get('/',                        [DashboardController::class, 'index']);
 Router::get('/dashboard',               [DashboardController::class, 'index']);
 Router::get('/dashboard/{view}',        [DashboardController::class, 'show']);
 
