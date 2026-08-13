@@ -47,8 +47,11 @@
   /* ══ SIDEBAR ══ */
   #sidebar {
     position: fixed;
-    inset-y: 0;
+    top: 0;
+    bottom: 0;
     left: 0;
+    height: 100vh;
+    max-height: 100vh;
     width: var(--sidebar-w);
     z-index: 40;
     display: flex;
@@ -64,6 +67,7 @@
     gap: .875rem;
     padding: 1.25rem 1.25rem 1rem;
     border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
   }
   .sidebar-logo-icon {
     width: 42px; height: 42px;
@@ -77,33 +81,50 @@
   .sidebar-brand { font-size: 1rem; font-weight: 900; color: #fff; letter-spacing: -.01em; line-height: 1.2; }
   .sidebar-group { font-size: .68rem; color: rgba(255,255,255,.4); margin-top: .1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .sidebar-section { font-size: .6rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.25); padding: 1.25rem 1.25rem .5rem; }
-  .sidebar-nav { flex: 1; overflow-y: auto; padding: .5rem .75rem; }
+  .sidebar-section {
+    font-size: .6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: rgba(255,255,255,.3);
+    padding: 1rem 1.25rem .35rem;
+    flex-shrink: 0;
+  }
+  .sidebar-nav {
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: .5rem .75rem 1.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
 
   .nav-item {
     display: flex; align-items: center; gap: .75rem;
     padding: .625rem .875rem;
     border-radius: .875rem;
     font-size: .83rem; font-weight: 500;
-    color: rgba(255,255,255,.5);
+    color: rgba(255,255,255,.6);
     text-decoration: none;
     transition: all .18s;
     margin-bottom: .2rem;
     white-space: nowrap; overflow: hidden;
   }
-  .nav-item:hover { color: #fff; background: rgba(255,255,255,.07); }
+  .nav-item:hover { color: #fff; background: rgba(255,255,255,.08); }
   .nav-item.active {
-    background: linear-gradient(135deg, rgba(37,99,235,.25), rgba(124,58,237,.12));
+    background: linear-gradient(135deg, rgba(37,99,235,.35), rgba(124,58,237,.25));
     color: #fff;
     font-weight: 700;
-    border: 1px solid rgba(37,99,235,.25);
-    box-shadow: 0 4px 20px rgba(37,99,235,.12);
+    border: 1px solid rgba(37,99,235,.4);
+    box-shadow: 0 4px 20px rgba(37,99,235,.2);
   }
   .nav-item .nav-icon { font-size: 1.05rem; flex-shrink: 0; }
 
   .sidebar-user {
     border-top: 1px solid var(--border);
     padding: 1rem .875rem;
+    flex-shrink: 0;
+    background: #080f1e;
   }
   .user-card {
     display: flex; align-items: center; gap: .75rem;
@@ -188,10 +209,9 @@
 
   /* ══ CARDS / COMPONENTS ══ */
   .card {
-    background: var(--bg-card);
+    background: #0d1930;
     border: 1px solid var(--border);
     border-radius: 1.25rem;
-    backdrop-filter: blur(8px);
   }
   .card-p { padding: 1.5rem; }
   .card-title { font-size: .9rem; font-weight: 800; color: #fff; }
@@ -199,7 +219,7 @@
 
   /* ══ STAT CARD ══ */
   .stat-card {
-    background: var(--bg-card);
+    background: #0d1930;
     border: 1px solid var(--border);
     border-radius: 1.25rem;
     padding: 1.25rem 1.5rem;
@@ -279,8 +299,13 @@
   .badge-muted   { background: rgba(255,255,255,.06); color: rgba(255,255,255,.45); border-color: rgba(255,255,255,.1); }
 
   /* ══ MOBILE OVERLAY ══ */
-  #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 35; backdrop-filter: blur(4px); }
-  #sidebar-overlay.visible { display: block; }
+  #sidebar-overlay { display: none !important; }
+  @media (max-width: 768px) {
+    #sidebar-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 35; backdrop-filter: blur(4px);
+    }
+    #sidebar-overlay.visible { display: block !important; }
+  }
 
   /* ══ PRINT ══ */
   @media print { .no-print { display: none !important; } body { background: white; color: black; } }
